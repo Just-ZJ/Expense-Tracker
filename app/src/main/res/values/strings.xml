@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ExpenseTracker</string>
+    <string name="button_select_date">Select Date</string>
+
 </resources>
