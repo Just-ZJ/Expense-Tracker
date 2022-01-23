@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">ExpenseTracker</string>
     <string name="button_select_date">Select Date</string>
+    <string name="hint_expense_details">Details</string>
 
 </resources>

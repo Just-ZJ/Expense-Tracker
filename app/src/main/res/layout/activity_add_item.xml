@@ -17,26 +17,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/button_select_date"
+    <ImageView
+        android:id="@+id/imageView_select_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="@string/button_select_date"
+        android:src="@drawable/ic_calendar"
         app:layout_constraintStart_toEndOf="@+id/textView_date"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!--    is this needed if there is chip group??
-    <EditText
-        android:id="@+id/editText_expense_category"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:autofillHints="Category"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_date" />
-    -->
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chipGroup_expense_category"
@@ -46,13 +36,16 @@
 
     <EditText
         android:id="@+id/editText_expense_details"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:inputType="textMultiLine"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chipGroup_expense_category"
-        android:minLines="5"
+        android:autofillHints="emailAddress"
+        android:hint="@string/hint_expense_details"
+        android:gravity="top|start"
+        android:lines="5"
         android:scrollbars="vertical" />
 
     <EditText

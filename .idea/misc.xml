@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/drawable-anydpi/ic_calendar.xml" value="0.14635416666666667" />
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/activity_add_item.xml" value="0.4" />
       </map>
     </option>
