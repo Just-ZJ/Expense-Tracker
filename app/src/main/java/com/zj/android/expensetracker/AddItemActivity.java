@@ -15,6 +15,7 @@ public class AddItemActivity extends AppCompatActivity {
 
     private TextView mDateTextView;
     private ImageView mSelectDateImageView;
+    private TextView mSelectedCategoriesTextView;
     private ChipGroup mCategoriesChipGroup;
 
     @Override
@@ -29,6 +30,9 @@ public class AddItemActivity extends AppCompatActivity {
         });
         mCategoriesChipGroup = findViewById(R.id.chipGroup_expense_category);
         populateChipGroup();
+        mSelectedCategoriesTextView = findViewById(R.id.textView_selected_categories);
+
+
     }
 
     private void populateChipGroup(){
@@ -43,6 +47,16 @@ public class AddItemActivity extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
         Chip newChip = (Chip) inflater.inflate(R.layout.action_add_chip, this.mCategoriesChipGroup, false);
         newChip.setText(category);
+//        updates mSelectedCategoriesTextView to show what is selected
+        newChip.setOnClickListener(view -> {
+            String text = (String) mSelectedCategoriesTextView.getText();
+            if (!text.equals("")){
+                text += ", " + category;
+            }else{
+                text += category;
+            }
+            mSelectedCategoriesTextView.setText(text);
+        });
         return newChip;
     }
 }
