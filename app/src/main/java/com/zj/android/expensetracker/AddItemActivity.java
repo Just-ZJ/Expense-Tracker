@@ -2,7 +2,6 @@ package com.zj.android.expensetracker;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,6 +16,7 @@ public class AddItemActivity extends AppCompatActivity {
     private ImageView mSelectDateImageView;
     private TextView mSelectedCategoriesTextView;
     private ChipGroup mCategoriesChipGroup;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +35,29 @@ public class AddItemActivity extends AppCompatActivity {
 
     }
 
-    private void populateChipGroup(){
+    private void updateSelectedCategoriesTextView(String category) {
+        StringBuilder text = new StringBuilder((String) mSelectedCategoriesTextView.getText());
+        int pos = text.indexOf(category);
+        switch (pos){
+            case -1:
+                // add category
+                if (text.length() != 0) text.append(", ");
+                text.append(category);
+                break;
+            case 0:
+                // remove category
+                text.delete(0, category.length());
+                break;
+            default:
+                text.delete(pos - 2, pos + category.length());
+        }
+        if(text.length() > 0) while(text.charAt(0) == ',' || text.charAt(0) == ' '){
+            text.deleteCharAt(0);
+        }
+        mSelectedCategoriesTextView.setText(text.toString());
+    }
+
+    private void populateChipGroup() {
 //        TODO: change this to create from an array of values
         mCategoriesChipGroup.addView(addChip("Grocery"));
         mCategoriesChipGroup.addView(addChip("Fuel"));
@@ -43,19 +65,14 @@ public class AddItemActivity extends AppCompatActivity {
         mCategoriesChipGroup.addView(addChip("Subscriptions"));
         mCategoriesChipGroup.addView(addChip("Miscellaneous"));
     }
+
     private Chip addChip(String category) {
         LayoutInflater inflater = LayoutInflater.from(this);
         Chip newChip = (Chip) inflater.inflate(R.layout.action_add_chip, this.mCategoriesChipGroup, false);
         newChip.setText(category);
-//        updates mSelectedCategoriesTextView to show what is selected
+        // updates mSelectedCategoriesTextView to show what is selected
         newChip.setOnClickListener(view -> {
-            String text = (String) mSelectedCategoriesTextView.getText();
-            if (!text.equals("")){
-                text += ", " + category;
-            }else{
-                text += category;
-            }
-            mSelectedCategoriesTextView.setText(text);
+            updateSelectedCategoriesTextView(category);
         });
         return newChip;
     }
