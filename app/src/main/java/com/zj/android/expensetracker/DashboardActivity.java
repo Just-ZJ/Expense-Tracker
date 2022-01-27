@@ -1,12 +1,13 @@
 package com.zj.android.expensetracker;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.widget.ScrollView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -14,18 +15,11 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
-//import com.anychart.AnyChart;
-//import com.anychart.AnyChartView;
-//import com.anychart.chart.common.dataentry.ValueDataEntry;
-//import com.anychart.charts.Pie;
-//import com.anychart.chart.common.dataentry.DataEntry;
-//
-//import java.util.ArrayList;
-//import java.util.List;
 
 
 public class DashboardActivity extends AppCompatActivity {
@@ -39,44 +33,124 @@ public class DashboardActivity extends AppCompatActivity {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int device_height_px = displayMetrics.heightPixels;
+        int device_width_px = displayMetrics.widthPixels;
+        float textSize = 12f;
 
-        // setup bar chart
+        // setup bar chart data
         List<BarEntry> barEntries = setupBarData();
         BarDataSet barDataSet = new BarDataSet(barEntries, "");
-        barDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+        barDataSet.setValueFormatter(new CustomValueFormatter());
+        barDataSet.setValueTextSize(textSize);
+        barDataSet.setColors(setGreenRedColors(barEntries));
         BarData barData = new BarData(barDataSet);
 
         BarChart barChart = findViewById(R.id.bar_chart);
-        barChart.setMinimumHeight(device_height_px);
+        barChart.setMinimumHeight(device_height_px / 4 * 3);
+        barChart.setMinimumWidth(device_width_px);
+//        ScrollView tryScroll = findViewById(R.id.try_scroll);
+//        tryScroll.setMinimumWidth(device_width_px * 2);
+
         barChart.setData(barData);
-        barChart.animateXY(2000,2000);
+        // how many bars are allowed to be seen at once
+        barChart.setVisibleXRangeMaximum(5);
+        float offset = device_width_px / 100f;
+        barChart.setExtraOffsets(offset*1,0,offset*5,0);
+
+        barChart.animateXY(2000, 2000);
+
+//        barChart.setTouchEnabled(true);
+//        barChart.setClickable(false);
+//        barChart.setDoubleTapToZoomEnabled(false);
+//        barChart.setDoubleTapToZoomEnabled(false);
+
+        setBarChartAttributes(barChart);
         barChart.invalidate(); // refresh chart
 
-        // setup pie chart
-        List<PieEntry> pieEntries= setupPieData();
+        // setup pie chart data
+        List<PieEntry> pieEntries = setupPieData();
         PieDataSet pieDataSet = new PieDataSet(pieEntries, "");
         pieDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+        pieDataSet.setValueTextSize(textSize);
         PieData pieData = new PieData(pieDataSet);
 
         PieChart pieChart = findViewById(R.id.pie_chart);
         pieChart.setMinimumHeight(device_height_px);
         pieChart.setData(pieData);
-        pieChart.animateXY(2000,2000);
+        pieChart.animateXY(2000, 2000);
+        // "Description Label" on bottom of graph
+        pieChart.getDescription().setEnabled(false);
         pieChart.invalidate(); // refresh chart
     }
 
     /************************* Bar Chart Helper Methods ***************************************/
-    private List<BarEntry> setupBarData(){
+    private List<BarEntry> setupBarData() {
         List<BarEntry> entries = new ArrayList<>();
         // NOTE: Order of the entries added determines their position.
-        entries.add(new BarEntry(1, 2.3f));
-        entries.add(new BarEntry(2, -2.3f));
-        entries.add(new BarEntry(3, 2.3f));
-        entries.add(new BarEntry(4, -2.3f));
+        entries.add(new BarEntry(0, 4.01f));
+        entries.add(new BarEntry(1, -2.32f));
+        entries.add(new BarEntry(2, 2.33f));
+        entries.add(new BarEntry(3, -2.35f));
+        entries.add(new BarEntry(4, 4.01f));
+        entries.add(new BarEntry(5, -2.32f));
+        entries.add(new BarEntry(6, 4.01f));
+        entries.add(new BarEntry(7, -2.32f));
+        entries.add(new BarEntry(8, 2.33f));
+        entries.add(new BarEntry(9, -2.35f));
+        entries.add(new BarEntry(10, 4.01f));
+        entries.add(new BarEntry(11, -2.32f));
         return entries;
     }
+
+    private int[] setGreenRedColors(List<BarEntry> entries) {
+        int[] colors = new int[entries.size()];
+        for (int i = 0; i < entries.size(); i++) {
+            if (entries.get(i).getY() < 0) {
+                // red if negative
+                colors[i] = Color.rgb(128,0,0);
+            } else {
+                // green if positive
+                colors[i] = Color.rgb(0,128,0);
+            }
+        }
+        return colors;
+    }
+
+    private void setBarChartAttributes(BarChart barChart) {
+        // borders of graph (the line on all 4 sides)
+        barChart.setDrawBorders(false);
+        // background color of graph
+        barChart.setDrawGridBackground(false);
+
+        // "Description Label" on bottom of graph
+        barChart.getDescription().setEnabled(false);
+        // legend on bottom of graph
+        barChart.getLegend().setEnabled(false);
+
+        // horizontal grid line in the chart
+        barChart.getAxisLeft().setDrawGridLines(false);
+        // left y-axis labels
+        barChart.getAxisLeft().setDrawLabels(false);
+        barChart.getAxisLeft().setDrawAxisLine(false);
+
+        // vertical grid line in the chart
+        barChart.getXAxis().setDrawGridLines(false);
+        // top x-axis labels
+        barChart.getXAxis().setDrawLabels(false);
+        // top x-axis border
+        barChart.getXAxis().setDrawAxisLine(false);
+
+        // horizontal grid line in the chart
+        barChart.getAxisRight().setDrawGridLines(false);
+        // right y-axis labels
+        barChart.getAxisRight().setDrawLabels(false);
+        barChart.getAxisRight().setDrawAxisLine(false);
+
+        // background of bars
+        barChart.setDrawBarShadow(false);
+    }
+
     /************************* Pie Chart Helper Methods ***************************************/
-    private List<PieEntry> setupPieData(){
+    private List<PieEntry> setupPieData() {
         List<PieEntry> entries = new ArrayList<>();
         // NOTE: Order of the entries added determines their position.
         entries.add(new PieEntry(18.5f, "Green"));
@@ -84,5 +158,47 @@ public class DashboardActivity extends AppCompatActivity {
         entries.add(new PieEntry(24.0f, "Red"));
         entries.add(new PieEntry(30.8f, "Blue"));
         return entries;
+    }
+
+    class CustomValueFormatter extends ValueFormatter {
+
+        @Override
+        public String getBarLabel(BarEntry barEntry) {
+            String val = "$" + super.getBarLabel(barEntry);
+            if(barEntry.getY() < 0) val = "-$" + (barEntry.getY() * -1);
+            return getMonth((int) barEntry.getX()) + ": " + val;
+        }
+
+        private String getMonth(int month) {
+            switch (month) {
+                case 0:
+                    return "January";
+                case 1:
+                    return "February";
+                case 2:
+                    return "March";
+                case 3:
+                    return "April";
+                case 4:
+                    return "May";
+                case 5:
+                    return "June";
+                case 6:
+                    return "July";
+                case 7:
+                    return "August";
+                case 8:
+                    return "September";
+                case 9:
+                    return "October";
+                case 10:
+                    return "November";
+                case 11:
+                    return "December";
+                default:
+                    return "";
+            }
+
+        }
     }
 }
