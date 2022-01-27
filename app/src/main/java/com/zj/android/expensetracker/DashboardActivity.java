@@ -3,7 +3,6 @@ package com.zj.android.expensetracker;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.widget.ScrollView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -34,7 +33,7 @@ public class DashboardActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int device_height_px = displayMetrics.heightPixels;
         int device_width_px = displayMetrics.widthPixels;
-        float textSize = 12f;
+        float textSize = 14f;
 
         // setup bar chart data
         List<BarEntry> barEntries = setupBarData();
@@ -47,21 +46,12 @@ public class DashboardActivity extends AppCompatActivity {
         BarChart barChart = findViewById(R.id.bar_chart);
         barChart.setMinimumHeight(device_height_px / 4 * 3);
         barChart.setMinimumWidth(device_width_px);
-//        ScrollView tryScroll = findViewById(R.id.try_scroll);
-//        tryScroll.setMinimumWidth(device_width_px * 2);
 
         barChart.setData(barData);
         // how many bars are allowed to be seen at once
         barChart.setVisibleXRangeMaximum(5);
         float offset = device_width_px / 100f;
-        barChart.setExtraOffsets(offset*1,0,offset*5,0);
-
-        barChart.animateXY(2000, 2000);
-
-//        barChart.setTouchEnabled(true);
-//        barChart.setClickable(false);
-//        barChart.setDoubleTapToZoomEnabled(false);
-//        barChart.setDoubleTapToZoomEnabled(false);
+        barChart.setExtraOffsets(offset * 1, 0, offset * 5, 0);
 
         setBarChartAttributes(barChart);
         barChart.invalidate(); // refresh chart
@@ -106,16 +96,23 @@ public class DashboardActivity extends AppCompatActivity {
         for (int i = 0; i < entries.size(); i++) {
             if (entries.get(i).getY() < 0) {
                 // red if negative
-                colors[i] = Color.rgb(128,0,0);
+                colors[i] = Color.rgb(158, 0, 0);
             } else {
                 // green if positive
-                colors[i] = Color.rgb(0,128,0);
+                colors[i] = Color.rgb(0, 128, 0);
             }
         }
         return colors;
     }
 
     private void setBarChartAttributes(BarChart barChart) {
+        barChart.animateXY(2000, 2000);
+
+        barChart.setTouchEnabled(true);
+        barChart.setClickable(false);
+        // zooming in of graph
+        barChart.setDoubleTapToZoomEnabled(false);
+
         // borders of graph (the line on all 4 sides)
         barChart.setDrawBorders(false);
         // background color of graph
@@ -160,12 +157,12 @@ public class DashboardActivity extends AppCompatActivity {
         return entries;
     }
 
-    class CustomValueFormatter extends ValueFormatter {
+    static class CustomValueFormatter extends ValueFormatter {
 
         @Override
         public String getBarLabel(BarEntry barEntry) {
             String val = "$" + super.getBarLabel(barEntry);
-            if(barEntry.getY() < 0) val = "-$" + (barEntry.getY() * -1);
+            if (barEntry.getY() < 0) val = "-$" + (barEntry.getY() * -1);
             return getMonth((int) barEntry.getX()) + ": " + val;
         }
 
