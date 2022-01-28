@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,14 +94,17 @@ public class TransactionActivity extends AppCompatActivity {
 
         @Override
         public View getGroupView(int i, boolean b, View view, ViewGroup viewGroup) {
-            String groupTitle = (String) getGroup(i);
+            String month = (String) getGroup(i);
+            String totalAmount = "$100.00";
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(R.layout.fragment_expandable_groups, null);
             }
-            TextView groupTitleTextView = view.findViewById(R.id.transaction_group);
-            groupTitleTextView.setText(groupTitle);
-            return groupTitleTextView;
+            TextView groupMonth = view.findViewById(R.id.transaction_group_month);
+            groupMonth.setText(month);
+            TextView groupTotalAmt = view.findViewById(R.id.transaction_group_amount);
+            groupTotalAmt.setText(totalAmount);
+            return view;
         }
 
         @Override
