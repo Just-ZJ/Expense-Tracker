@@ -7,6 +7,12 @@
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/action_add_chip.xml" value="0.13020833333333334" />
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/activity_add_item.xml" value="0.264" />
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/activity_main.xml" value="0.13020833333333334" />
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/activity_transaction.xml" value="0.12291666666666666" />
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_expandableListView_groups.xml" value="0.14010416666666667" />
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_expandableList_groups.xml" value="0.14010416666666667" />
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_expandableList_item.xml" value="0.14010416666666667" />
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_expandable_groups.xml" value="0.14010416666666667" />
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_expandable_item.xml" value="0.24208375893769152" />
       </map>
     </option>
   </component>
