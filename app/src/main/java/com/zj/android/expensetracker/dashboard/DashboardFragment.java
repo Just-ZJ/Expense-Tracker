@@ -76,6 +76,8 @@ public class DashboardFragment extends Fragment {
         pieChart.animateXY(2000, 2000);
         // "Description Label" on bottom of graph
         pieChart.getDescription().setEnabled(false);
+        // legend on bottom of graph
+        pieChart.getLegend().setEnabled(false);
         pieChart.invalidate(); // refresh chart
         return mView;
     }
