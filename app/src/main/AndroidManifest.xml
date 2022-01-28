@@ -19,9 +19,14 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".TransactionActivity"
+            android:exported="true">
+        </activity>
+        <activity
             android:name=".AddItemActivity"
             android:exported="true">
         </activity>
+
     </application>
 
 </manifest>
