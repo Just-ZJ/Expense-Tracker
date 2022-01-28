@@ -1,4 +1,4 @@
-package com.zj.android.expensetracker;
+package com.zj.android.expensetracker.transaction;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,6 +10,8 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.zj.android.expensetracker.R;
 
 import org.w3c.dom.Text;
 

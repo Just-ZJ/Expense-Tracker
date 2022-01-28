@@ -1,4 +1,4 @@
-package com.zj.android.expensetracker;
+package com.zj.android.expensetracker.dashboard;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,6 +16,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.zj.android.expensetracker.R;
 
 import java.util.ArrayList;
 import java.util.List;

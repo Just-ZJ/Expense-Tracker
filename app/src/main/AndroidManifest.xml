@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ExpenseTracker">
         <activity
-            android:name=".DashboardActivity"
+            android:name=".dashboard.DashboardActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,11 +19,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".TransactionActivity"
+            android:name=".transaction.TransactionActivity"
             android:exported="true">
         </activity>
         <activity
-            android:name=".AddItemActivity"
+            android:name=".add_item.AddItemActivity"
             android:exported="true">
         </activity>
 

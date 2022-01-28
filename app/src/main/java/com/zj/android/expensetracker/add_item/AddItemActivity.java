@@ -1,4 +1,4 @@
-package com.zj.android.expensetracker;
+package com.zj.android.expensetracker.add_item;
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.zj.android.expensetracker.R;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -150,7 +151,7 @@ public class AddItemActivity extends AppCompatActivity {
 
     private Chip addChip(String category) {
         LayoutInflater inflater = LayoutInflater.from(this);
-        Chip newChip = (Chip) inflater.inflate(R.layout.action_add_chip, this.mCategoriesChipGroup, false);
+        Chip newChip = (Chip) inflater.inflate(R.layout.fragment_add_chip, this.mCategoriesChipGroup, false);
         newChip.setText(category);
         // updates mSelectedCategoriesTextView to show what is selected
         newChip.setOnClickListener(view -> {
