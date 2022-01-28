@@ -76,7 +76,7 @@ public class AddItemFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.activity_add_item, null);
+        mView = inflater.inflate(R.layout.activity_add_item, container, false);
         mDateTextView = mView.findViewById(R.id.textView_date);
         // shows today's date
         Calendar cal = Calendar.getInstance();
