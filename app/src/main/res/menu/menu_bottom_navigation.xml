@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/bottom_appbar_dashboard"
+        android:icon="@drawable/ic_dashboard"
+        android:title="Dashboard"
+        android:onClick="startDashboard"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/holder"
+        android:title=""
+        app:showAsAction="ifRoom"
+        android:enabled="false"/>
+
+    <item
+        android:id="@+id/bottom_appbar_transaction"
+        android:icon="@drawable/ic_transaction"
+        android:title="Transactions"
+        android:onClick="startTransaction"
+        app:showAsAction="ifRoom"/>
+</menu>

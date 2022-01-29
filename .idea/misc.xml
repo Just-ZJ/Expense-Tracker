@@ -7,15 +7,22 @@
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/action_add_chip.xml" value="0.13020833333333334" />
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/activity_add_item.xml" value="0.264" />
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/activity_dashboard.xml" value="0.146875" />
-        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/activity_fragment.xml" value="0.25416666666666665" />
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/activity_fragment.xml" value="0.1" />
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/activity_main.xml" value="0.13020833333333334" />
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/activity_transaction.xml" value="0.12291666666666666" />
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_add_chip.xml" value="0.1234375" />
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_blank.xml" value="0.14375" />
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_expandableListView_groups.xml" value="0.14010416666666667" />
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_expandableList_groups.xml" value="0.14010416666666667" />
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_expandableList_item.xml" value="0.14010416666666667" />
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_expandable_groups.xml" value="0.4" />
         <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_expandable_item.xml" value="0.24208375893769152" />
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layouts/add_item/layout/activity_fragment.xml" value="0.1234375" />
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layouts/add_item/layout/asd.xml" value="0.1234375" />
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layouts/dashboard/layout/asd.xml" value="0.1234375" />
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layouts/layout/asf.xml" value="0.1234375" />
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layouts/transaction/layout/asd.xml" value="0.1234375" />
+        <entry key="..\:/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/menu/menu_bottom_navigation.xml" value="0.1" />
       </map>
     </option>
   </component>
