@@ -6,19 +6,17 @@
         android:id="@+id/bottom_appbar_dashboard"
         android:icon="@drawable/ic_dashboard"
         android:title="Dashboard"
-        android:onClick="startDashboard"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/holder"
+        android:enabled="false"
         android:title=""
-        app:showAsAction="ifRoom"
-        android:enabled="false"/>
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/bottom_appbar_transaction"
         android:icon="@drawable/ic_transaction"
         android:title="Transactions"
-        android:onClick="startTransaction"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 </menu>

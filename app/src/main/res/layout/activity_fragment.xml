@@ -4,14 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+    <androidx.viewpager.widget.ViewPager
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-    <!--    <androidx.viewpager2.widget.ViewPager2-->
-    <!--        android:id="@+id/fragment_container"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent"/>-->
 
     <!-- Source: https://www.youtube.com/watch?v=ywqCTCR2a0w -->
     <com.google.android.material.bottomappbar.BottomAppBar
@@ -34,6 +30,7 @@
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floating_action_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/white"
