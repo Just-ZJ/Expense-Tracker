@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.chip.Chip;
@@ -166,7 +165,7 @@ public class AddItemFragment extends Fragment {
 
     private Chip addChip(String category) {
         LayoutInflater inflater = LayoutInflater.from(mView.getContext());
-        Chip newChip = (Chip) inflater.inflate(R.layout.fragment_add_chip, this.mCategoriesChipGroup, false);
+        Chip newChip = (Chip) inflater.inflate(R.layout.fragment_add_item_add_chip, this.mCategoriesChipGroup, false);
         newChip.setText(category);
         // updates mSelectedCategoriesTextView to show what is selected
         newChip.setOnClickListener(view -> updateSelectedCategoriesTextView(category));

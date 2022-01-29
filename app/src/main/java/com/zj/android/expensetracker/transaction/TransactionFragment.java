@@ -11,13 +11,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.zj.android.expensetracker.R;
-import com.zj.android.expensetracker.SingleFragmentActivity;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,7 +103,7 @@ public class TransactionFragment extends Fragment {
             String totalAmount = "$100.00";
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.fragment_expandable_groups, null);
+                view = inflater.inflate(R.layout.fragment_transaction_expandable_groups, null);
             }
             TextView groupMonth = view.findViewById(R.id.transaction_group_month);
             groupMonth.setText(month);
@@ -124,7 +120,7 @@ public class TransactionFragment extends Fragment {
             String categories = "ALL CATEGORIES";
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.fragment_expandable_item, null);
+                view = inflater.inflate(R.layout.fragment_transaction_expandable_item, null);
             }
             TextView transactionDate = view.findViewById(R.id.transaction_item_date);
             transactionDate.setText(date);
