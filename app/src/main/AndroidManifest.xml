@@ -18,16 +18,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".transaction.TransactionActivity"
-            android:exported="true">
+<!--        <activity-->
+<!--            android:name=".transaction.TransactionActivity"-->
+<!--            android:exported="true">-->
 
-        </activity>
-        <activity
-            android:name=".add_item.AddItemActivity"
-            android:exported="true">
+<!--        </activity>-->
+<!--        <activity-->
+<!--            android:name=".add_item.AddItemActivity"-->
+<!--            android:exported="true">-->
 
-        </activity>
+<!--        </activity>-->
 
     </application>
 

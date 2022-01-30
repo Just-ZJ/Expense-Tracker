@@ -5,9 +5,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -18,8 +18,8 @@ import com.zj.android.expensetracker.transaction.TransactionFragment;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity {
 
-    FragmentPagerAdapter mPagerAdapter;
-    ViewPager mViewPager;
+    private ViewPager2 mViewPager2;
+    private FragmentStateAdapter mAdapter;
 
     protected abstract Fragment createFragment();
 
@@ -31,29 +31,27 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setBackground(null);
 
-
-        mViewPager = findViewById(R.id.fragment_container);
-        mPagerAdapter = new CustomFragmentStateAdapter(getSupportFragmentManager());
-        mViewPager.setAdapter(mPagerAdapter);
+        mViewPager2 = findViewById(R.id.fragment_container);
+        mAdapter = new CustomFragmentStateAdapter(this);
+        mViewPager2.setAdapter(mAdapter);
 
         // on click events for bottom app bar
         BottomNavigationItemView menu_dashboard = findViewById(R.id.bottom_appbar_dashboard);
-        menu_dashboard.setOnClickListener(view -> mViewPager.setCurrentItem(0, true));
+        menu_dashboard.setOnClickListener(view -> mViewPager2.setCurrentItem(0, true));
         FloatingActionButton menu_fab = findViewById(R.id.floating_action_button);
-        menu_fab.setOnClickListener(view -> mViewPager.setCurrentItem(1, true));
+        menu_fab.setOnClickListener(view -> mViewPager2.setCurrentItem(1, true));
         BottomNavigationItemView menu_transaction = findViewById(R.id.bottom_appbar_transaction);
-        menu_transaction.setOnClickListener(view -> mViewPager.setCurrentItem(2, true));
+        menu_transaction.setOnClickListener(view -> mViewPager2.setCurrentItem(2, true));
     }
 
-    public static class CustomFragmentStateAdapter extends FragmentPagerAdapter {
-
-        public CustomFragmentStateAdapter(FragmentManager fm) {
-            super(fm);
+    public static class CustomFragmentStateAdapter extends FragmentStateAdapter {
+        public CustomFragmentStateAdapter(FragmentActivity fragmentActivity) {
+            super(fragmentActivity);
         }
 
         @NonNull
         @Override
-        public Fragment getItem(int position) {
+        public Fragment createFragment(int position) {
             switch (position) {
                 case 0:
                     return new DashboardFragment();
@@ -61,12 +59,14 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
                     return new AddItemFragment();
                 case 2:
                     return new TransactionFragment();
+                default:
+                    return null;
             }
-            return null;
         }
 
         @Override
-        public int getCount() {
+        public int getItemCount() {
+            // number of fragments/pages
             return 3;
         }
 
