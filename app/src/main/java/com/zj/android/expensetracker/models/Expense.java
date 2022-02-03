@@ -1,17 +1,16 @@
-package com.zj.android.expensetracker;
+package com.zj.android.expensetracker.models;
 
-import java.util.List;
 import java.util.UUID;
 
 public class Expense {
 
-    private UUID mId;
+    private final UUID mId;
     private String mDate;
     private String mCategories;
     private String mDetails;
     private Double mAmount;
 
-    public Expense(String date, String categories, String details, Double amount){
+    public Expense(String date, String categories, String details, Double amount) {
         mId = UUID.randomUUID();
         mDate = date;
         mDetails = details;
@@ -21,10 +20,6 @@ public class Expense {
 
     public UUID getId() {
         return mId;
-    }
-
-    public void setId(UUID id) {
-        mId = id;
     }
 
     public String getDate() {

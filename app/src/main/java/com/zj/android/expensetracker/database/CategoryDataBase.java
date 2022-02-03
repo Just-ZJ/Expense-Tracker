@@ -1,6 +1,5 @@
 package com.zj.android.expensetracker.database;
 
-import static com.zj.android.expensetracker.database.CategoryDbSchema.CategoryTable.Cols;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.zj.android.expensetracker.database.CategoryDbSchema.CategoryTable;
+import com.zj.android.expensetracker.database.CategoryDbSchema.CategoryTable.Cols;
 import com.zj.android.expensetracker.models.Category;
 
 public class CategoryDataBase extends SQLiteOpenHelper {
@@ -20,6 +20,7 @@ public class CategoryDataBase extends SQLiteOpenHelper {
 
     private static ContentValues getContentValues(Category category) {
         ContentValues values = new ContentValues();
+        values.put(Cols.UUID, category.getId().toString());
         values.put(Cols.NAME, category.getName());
         return values;
     }
@@ -28,6 +29,7 @@ public class CategoryDataBase extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("create table " + CategoryTable.NAME + "(" +
                 " _id integer primary key autoincrement, " +
+                Cols.UUID + ", " +
                 Cols.NAME +
                 ")"
         );
