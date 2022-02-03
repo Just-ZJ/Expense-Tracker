@@ -21,7 +21,6 @@ public class ExpenseDataBase extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("create table " + ExpenseTable.NAME + "(" +
                 " _id integer primary key autoincrement, " +
                 ExpenseTable.Cols.DATE + ", " +
-                ExpenseTable.Cols.CATEGORIES + ", " +
                 ExpenseTable.Cols.DETAILS + ", " +
                 ExpenseTable.Cols.AMOUNT +
                 ")"
@@ -31,7 +30,6 @@ public class ExpenseDataBase extends SQLiteOpenHelper {
     private static ContentValues getContentValues(Expense expense) {
         ContentValues values = new ContentValues();
         values.put(ExpenseTable.Cols.DATE, expense.getDate());
-        values.put(ExpenseTable.Cols.CATEGORIES, expense.getCategories());
         values.put(ExpenseTable.Cols.DETAILS, expense.getDetails());
         values.put(ExpenseTable.Cols.AMOUNT, expense.getAmount());
         return values;
