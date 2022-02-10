@@ -8,10 +8,12 @@ public class ExpenseToCategory {
     private UUID mExpenseId;
     private UUID mCategoryId;
 
-    public ExpenseToCategory(UUID expenseId, UUID categoryId) {
-        mId = UUID.randomUUID();
-        mExpenseId = expenseId;
-        mCategoryId = categoryId;
+    public ExpenseToCategory(UUID uuid) {
+        mId = uuid;
+    }
+
+    public ExpenseToCategory() {
+        this(UUID.randomUUID());
     }
 
     public UUID getId() {

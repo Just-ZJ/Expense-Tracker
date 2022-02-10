@@ -10,12 +10,12 @@ public class Expense {
     private String mDetails;
     private Double mAmount;
 
-    public Expense(String date, String categories, String details, Double amount) {
-        mId = UUID.randomUUID();
-        mDate = date;
-        mDetails = details;
-        mCategories = categories;
-        mAmount = amount;
+    public Expense(UUID uuid) {
+        mId = uuid;
+    }
+
+    public Expense() {
+        this(UUID.randomUUID());
     }
 
     public UUID getId() {

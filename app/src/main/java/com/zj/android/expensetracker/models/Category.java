@@ -7,9 +7,12 @@ public class Category {
     private final UUID mId;
     private String mName;
 
-    public Category(String name) {
-        mId = UUID.randomUUID();
-        mName = name;
+    public Category(UUID uuid) {
+        mId = uuid;
+    }
+
+    public Category() {
+        this(UUID.randomUUID());
     }
 
     public UUID getId() {
