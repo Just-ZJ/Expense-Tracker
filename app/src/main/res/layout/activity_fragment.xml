@@ -7,7 +7,8 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginBottom="56dp" />
 
     <!-- Source: https://www.youtube.com/watch?v=ywqCTCR2a0w -->
     <com.google.android.material.bottomappbar.BottomAppBar
@@ -23,10 +24,12 @@
             android:id="@+id/bottomNavigationView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
+            android:layout_marginEnd="20dp"
             android:background="@android:color/transparent"
             app:labelVisibilityMode="labeled"
             app:menu="@menu/menu_bottom_navigation" />
+        <!--            app:itemIconTint="@color/bottom_appbar_colors"-->
+        <!--            app:itemTextColor="@color/bottom_appbar_colors"-->
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -36,6 +39,7 @@
         android:backgroundTint="@color/white"
         app:layout_anchor="@id/bottomAppBar"
         app:maxImageSize="50dp"
+        android:contentDescription="@string/button_add_item"
         app:srcCompat="@drawable/ic_add" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
