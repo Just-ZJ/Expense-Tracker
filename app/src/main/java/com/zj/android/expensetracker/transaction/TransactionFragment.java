@@ -13,7 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
+import com.zj.android.expensetracker.models.Expense;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,20 +28,23 @@ public class TransactionFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-       mView = inflater.inflate(R.layout.activity_transaction, container, false);
+        mView = inflater.inflate(R.layout.activity_transaction, container, false);
 
         mExpandableListView = mView.findViewById(R.id.transaction_expandableListView);
-        List<String> transactions = new ArrayList<>();
+//        DatabaseAccessor databaseAccessor = new DatabaseAccessor(getContext());
+        List<Expense> expenses = DatabaseAccessor.getExpenses();
+
         List<String> months = new ArrayList<>();
-        for (int i = 1; i < 31; i++) {
-            if (i < 13) months.add("Month" + i);
-            transactions.add(i + " January 2022");
-        }
-        mExpandableListView.setAdapter(new CustomExpandableListAdapter(mView.getContext(), transactions, months));
+        months.add("Month 1");
+
+        CustomExpandableListAdapter adapter = new CustomExpandableListAdapter(mView.getContext(), expenses, months);
+        mExpandableListView.setAdapter(adapter);
         mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int i) {
-
+                // update expenses
+                List<Expense> expenses = DatabaseAccessor.getExpenses();
+                adapter.updateItems(expenses);
             }
         });
         mExpandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
@@ -53,13 +58,18 @@ public class TransactionFragment extends Fragment {
 
     public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         Context context;
-        List<String> transactions;
+        List<Expense> expenses;
         List<String> months;
 
-        public CustomExpandableListAdapter(Context context, List<String> transactions, List<String> months) {
+        public CustomExpandableListAdapter(Context context, List<Expense> expenses, List<String> months) {
             this.context = context;
-            this.transactions = transactions;
+            this.expenses = expenses;
             this.months = months;
+        }
+
+        public void updateItems(List<Expense> expenses) {
+            this.expenses = expenses;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -69,7 +79,7 @@ public class TransactionFragment extends Fragment {
 
         @Override
         public int getChildrenCount(int i) {
-            return transactions.size();
+            return expenses.size();
         }
 
         @Override
@@ -79,7 +89,8 @@ public class TransactionFragment extends Fragment {
 
         @Override
         public Object getChild(int i, int i1) {
-            return transactions.get(i);
+            // getChild(int groupPosition, int childPosition)
+            return expenses.get(i1);
         }
 
         @Override
@@ -114,10 +125,11 @@ public class TransactionFragment extends Fragment {
 
         @Override
         public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
-            String date = (String) getChild(i, i1);
-            String amount = "$0.00";
-            String details = "Details of the transaction is .......";
-            String categories = "ALL CATEGORIES";
+            Expense expense = (Expense) getChild(i, i1);
+            String date = expense.getDate();
+            String amount = expense.getAmount().toString();
+            String details = expense.getDetails();
+            String categories = expense.getCategories();
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(R.layout.fragment_transaction_expandable_item, null);
@@ -130,6 +142,7 @@ public class TransactionFragment extends Fragment {
             transactionCategories.setText(categories);
             TextView transactionDetails = view.findViewById(R.id.transaction_item_details);
             transactionDetails.setText(details);
+
             return view;
         }
 
