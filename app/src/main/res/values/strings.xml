@@ -4,5 +4,5 @@
     <string name="button_select_date">Select Date</string>
     <string name="hint_expense_details">Details</string>
     <string name="label_selected_categories">Category: </string>
-    <string name="button_add_item">Add</string>
+    <string name="button_add_item">Add Expense</string>
 </resources>

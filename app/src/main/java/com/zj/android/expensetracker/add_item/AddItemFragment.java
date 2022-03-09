@@ -6,6 +6,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,10 +14,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.zj.android.expensetracker.models.Expense;
 import com.zj.android.expensetracker.R;
+import com.zj.android.expensetracker.database.ExpenseDataBase;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -27,8 +31,10 @@ public class AddItemFragment extends Fragment {
     private ImageView mSelectDateImageView;
     private TextView mSelectedCategoriesTextView;
     private ChipGroup mCategoriesChipGroup;
-    private EditText mExpenseDetails;
-    private EditText mAmount;
+    private EditText mExpenseDetailsEditText;
+    private EditText mAmountEditText;
+    private Button mAddExpenseButton;
+    private ExpenseDataBase mDataBase;
 
     private View mView;
 
@@ -75,8 +81,12 @@ public class AddItemFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        mDataBase = new ExpenseDataBase(this.getContext());
+
         mView = inflater.inflate(R.layout.activity_add_item, container, false);
         mDateTextView = mView.findViewById(R.id.textView_date);
+
         // shows today's date
         Calendar cal = Calendar.getInstance();
         mDateTextView.setText(formatDate(cal.get(Calendar.DAY_OF_WEEK), cal.get(Calendar.MONTH),
@@ -91,8 +101,8 @@ public class AddItemFragment extends Fragment {
         mCategoriesChipGroup = mView.findViewById(R.id.chipGroup_expense_category);
         populateChipGroup();
 
-        mExpenseDetails = mView.findViewById(R.id.editText_expense_details);
-        mExpenseDetails.addTextChangedListener(new TextWatcher() {
+        mExpenseDetailsEditText = mView.findViewById(R.id.editText_expense_details);
+        mExpenseDetailsEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -109,8 +119,8 @@ public class AddItemFragment extends Fragment {
             }
         });
 
-        mAmount = mView.findViewById(R.id.editText_amount);
-        mAmount.addTextChangedListener(new TextWatcher() {
+        mAmountEditText = mView.findViewById(R.id.editText_amount);
+        mAmountEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -127,11 +137,34 @@ public class AddItemFragment extends Fragment {
             }
         });
 
+        mAddExpenseButton = mView.findViewById(R.id.add_expense_button);
+        mAddExpenseButton.setOnClickListener(view -> {
+            // add expense to database
+            Double amount = Double.valueOf(mAmountEditText.getText().toString());
+
+            Expense expense = new Expense();
+            expense.setDate(mDateTextView.getText().toString());
+            expense.setCategories(mSelectedCategoriesTextView.getText().toString());
+            expense.setDetails(mExpenseDetailsEditText.getText().toString());
+            expense.setAmount(amount);
+
+            mDataBase.addExpense(expense);
+
+            clearFields();
+            // switch to transaction fragment
+            ViewPager2 viewPager2 = (ViewPager2) getActivity().findViewById(R.id.fragment_container);
+            viewPager2.setCurrentItem(2, true);
+        });
         return mView;
     }
 
+    private void clearFields(){
+        mSelectedCategoriesTextView.setText("");
+        mExpenseDetailsEditText.setText("");
+        mAmountEditText.setText("0.00");
+    }
 
-
+    // update text view with what chip was selected
     private void updateSelectedCategoriesTextView(String category) {
         StringBuilder text = new StringBuilder((String) mSelectedCategoriesTextView.getText());
         int pos = text.indexOf(category);
@@ -142,10 +175,11 @@ public class AddItemFragment extends Fragment {
                 text.append(category);
                 break;
             case 0:
-                // remove category
+                // remove category for index 0
                 text.delete(0, category.length());
                 break;
             default:
+                // remove category for non index 0
                 text.delete(pos - 2, pos + category.length());
         }
         if (text.length() > 0) while (text.charAt(0) == ',' || text.charAt(0) == ' ') {
@@ -155,7 +189,8 @@ public class AddItemFragment extends Fragment {
     }
 
     private void populateChipGroup() {
-//        TODO: change this to create from an array of values
+        //        TODO: change this to create from an array of values
+        //        TODO: change this to using database
         mCategoriesChipGroup.addView(addChip("Grocery"));
         mCategoriesChipGroup.addView(addChip("Fuel"));
         mCategoriesChipGroup.addView(addChip("Dining"));
@@ -171,6 +206,4 @@ public class AddItemFragment extends Fragment {
         newChip.setOnClickListener(view -> updateSelectedCategoriesTextView(category));
         return newChip;
     }
-
-
 }
