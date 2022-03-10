@@ -31,7 +31,7 @@ public class TransactionFragment extends Fragment {
         mView = inflater.inflate(R.layout.activity_transaction, container, false);
 
         mExpandableListView = mView.findViewById(R.id.transaction_expandableListView);
-//        DatabaseAccessor databaseAccessor = new DatabaseAccessor(getContext());
+        DatabaseAccessor databaseAccessor = new DatabaseAccessor(getContext());
         List<Expense> expenses = DatabaseAccessor.getExpenses();
 
         List<String> months = new ArrayList<>();
