@@ -27,9 +27,11 @@
             android:layout_marginEnd="20dp"
             android:background="@android:color/transparent"
             app:labelVisibilityMode="labeled"
+            app:itemBackground="@android:color/transparent"
+            app:itemIconTint="@color/bottom_appbar_colors"
+            app:itemTextColor="@color/bottom_appbar_colors"
             app:menu="@menu/menu_bottom_navigation" />
-        <!--            app:itemIconTint="@color/bottom_appbar_colors"-->
-        <!--            app:itemTextColor="@color/bottom_appbar_colors"-->
+
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

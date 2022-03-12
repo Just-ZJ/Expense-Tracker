@@ -37,11 +37,19 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 
         // on click events for bottom app bar
         BottomNavigationItemView menu_dashboard = findViewById(R.id.bottom_appbar_dashboard);
-        menu_dashboard.setOnClickListener(view -> mViewPager2.setCurrentItem(0, true));
+        menu_dashboard.setOnClickListener(view -> {
+            mViewPager2.setCurrentItem(0, true);
+            // set color of icon when clicked
+            bottomNavigationView.setSelectedItemId(R.id.bottom_appbar_dashboard);
+        });
         FloatingActionButton menu_fab = findViewById(R.id.floating_action_button);
         menu_fab.setOnClickListener(view -> mViewPager2.setCurrentItem(1, true));
         BottomNavigationItemView menu_transaction = findViewById(R.id.bottom_appbar_transaction);
-        menu_transaction.setOnClickListener(view -> mViewPager2.setCurrentItem(2, true));
+        menu_transaction.setOnClickListener(view -> {
+            mViewPager2.setCurrentItem(2, true);
+            // set color of icon when clicked
+            bottomNavigationView.setSelectedItemId(R.id.bottom_appbar_transaction);
+        });
     }
 
     public static class CustomFragmentStateAdapter extends FragmentStateAdapter {
