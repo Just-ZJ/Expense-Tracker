@@ -24,6 +24,7 @@ public class TransactionFragment extends Fragment {
 
     private ExpandableListView mExpandableListView;
     private View mView;
+    private CustomExpandableListAdapter mCustomExpandableListAdapter;
 
     @Nullable
     @Override
@@ -37,14 +38,15 @@ public class TransactionFragment extends Fragment {
         List<String> months = new ArrayList<>();
         months.add("Month 1");
 
-        CustomExpandableListAdapter adapter = new CustomExpandableListAdapter(mView.getContext(), expenses, months);
-        mExpandableListView.setAdapter(adapter);
+        mCustomExpandableListAdapter = new CustomExpandableListAdapter(mView.getContext(), expenses, months);
+        mExpandableListView.setAdapter(mCustomExpandableListAdapter);
+
         mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int i) {
                 // update expenses
                 List<Expense> expenses = DatabaseAccessor.getExpenses();
-                adapter.updateItems(expenses);
+                mCustomExpandableListAdapter.updateItems(expenses);
             }
         });
         mExpandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
@@ -54,6 +56,19 @@ public class TransactionFragment extends Fragment {
             }
         });
         return mView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // close all expandable lists so that it can refresh
+        collapseAll();
+    }
+
+    private void collapseAll() {
+        for (int i = 0; i < mExpandableListView.getExpandableListAdapter().getGroupCount(); i++) {
+            mExpandableListView.collapseGroup(i);
+        }
     }
 
     public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
