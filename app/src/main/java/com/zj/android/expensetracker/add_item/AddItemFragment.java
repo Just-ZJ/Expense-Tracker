@@ -18,11 +18,15 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
-import com.zj.android.expensetracker.models.Expense;
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointBackward;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.zj.android.expensetracker.R;
 import com.zj.android.expensetracker.database.ExpenseDataBase;
+import com.zj.android.expensetracker.models.Expense;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class AddItemFragment extends Fragment {
@@ -73,6 +77,11 @@ public class AddItemFragment extends Fragment {
                 getDayString(day), month + 1, date, year);
     }
 
+    private void mDateTextSetDate(Calendar cal) {
+        mDateTextView.setText(formatDate(cal.get(Calendar.DAY_OF_WEEK), cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.YEAR)));
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,14 +96,39 @@ public class AddItemFragment extends Fragment {
         mView = inflater.inflate(R.layout.activity_add_item, container, false);
         mDateTextView = mView.findViewById(R.id.textView_date);
 
-        // shows today's date
+        // set to today's date
         Calendar cal = Calendar.getInstance();
-        mDateTextView.setText(formatDate(cal.get(Calendar.DAY_OF_WEEK), cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.YEAR)));
+        mDateTextSetDate(cal);
 
         mSelectDateImageView = mView.findViewById(R.id.imageView_select_date);
         mSelectDateImageView.setOnClickListener(view -> {
-            // TODO: open the date picker fragment
+            // set to only being able to select dates before today's date
+            CalendarConstraints constraints = new CalendarConstraints.Builder()
+                    .setValidator(DateValidatorPointBackward.now())
+                    .build();
+
+            MaterialDatePicker<?> datePicker = MaterialDatePicker.Builder.datePicker()
+                    .setTitleText("Select Date")
+                    .setSelection(cal.getTimeInMillis())
+                    .setCalendarConstraints(constraints)
+                    .build();
+
+            // open and show the date picker fragment
+            datePicker.show(getActivity().getSupportFragmentManager(), null);
+
+            datePicker.addOnPositiveButtonClickListener(listener -> {
+                try {
+                    // set to selected date
+                    long dateVal = Long.parseLong(datePicker.getSelection().toString());
+                    cal.setTime(new Date(dateVal));
+                } catch (NumberFormatException e) {
+                    throw new NumberFormatException("Invalid Date from MaterialDatePicker.");
+                }
+                // offset by 1 day to show date correctly in text
+                cal.add(Calendar.DATE, 1);
+                mDateTextSetDate(cal);
+                cal.add(Calendar.DATE, -1);
+            });
         });
 
         mSelectedCategoriesTextView = mView.findViewById(R.id.textView_selected_categories);
@@ -152,13 +186,14 @@ public class AddItemFragment extends Fragment {
 
             clearFields();
             // switch to transaction fragment
-            ViewPager2 viewPager2 = (ViewPager2) getActivity().findViewById(R.id.fragment_container);
+            ViewPager2 viewPager2 = getActivity().findViewById(R.id.fragment_container);
             viewPager2.setCurrentItem(2, true);
         });
         return mView;
     }
 
-    private void clearFields(){
+
+    private void clearFields() {
         mSelectedCategoriesTextView.setText("");
         mExpenseDetailsEditText.setText("");
         mAmountEditText.setText("0.00");
