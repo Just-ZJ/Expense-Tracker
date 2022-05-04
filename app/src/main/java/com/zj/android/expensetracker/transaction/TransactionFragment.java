@@ -21,6 +21,8 @@ import com.zj.android.expensetracker.models.Expense;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,137 +33,6 @@ public class TransactionFragment extends Fragment {
     private View mView;
     private CustomExpandableListAdapter mCustomExpandableListAdapter;
     private CustomViewModel mViewModel;
-
-    public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
-        Context mContext;
-        HashMap<String, List<Expense>> mExpenses;
-        List<String> mMonths;
-
-        public CustomExpandableListAdapter(Context context, List<Expense> expenses) {
-            this.mContext = context;
-            this.mExpenses = new HashMap<>();
-            this.mMonths = new ArrayList<>();
-            createMap(expenses);
-        }
-
-        @Override
-        public int getGroupCount() {
-            return mExpenses.size();
-        }
-
-        @Override
-        public int getChildrenCount(int i) {
-            // 	getChildrenCount(int groupPosition)
-            return mExpenses.get(mMonths.get(i)).size();
-        }
-
-        @Override
-        public Object getGroup(int i) {
-            return mMonths.get(i);
-        }
-
-        @Override
-        public Object getChild(int i, int i1) {
-            // getChild(int groupPosition, int childPosition)
-            return mExpenses.get(mMonths.get(i)).get(i1);
-        }
-
-        @Override
-        public long getGroupId(int i) {
-            return i;
-        }
-
-        @Override
-        public long getChildId(int i, int i1) {
-            return i1;
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return false;
-        }
-
-        @Override
-        public View getGroupView(int i, boolean b, View view, ViewGroup viewGroup) {
-            String month = (String) getGroup(i);
-            double amount = 0.00;
-            List<Expense> currExpenses = mExpenses.get(mMonths.get(i));
-            for (Expense e : currExpenses) {
-                amount += e.getAmount();
-            }
-            String totalAmount = String.format("$%.2f", amount);
-            if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.fragment_transaction_expandable_groups, null);
-            }
-            TextView groupMonth = view.findViewById(R.id.transaction_group_month);
-            groupMonth.setText(month);
-            TextView groupTotalAmt = view.findViewById(R.id.transaction_group_amount);
-            groupTotalAmt.setText(totalAmount);
-            return view;
-        }
-
-        @Override
-        public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
-            Expense expense = (Expense) getChild(i, i1);
-            String date = expense.getDate();
-            String amount = String.format("$%.2f", expense.getAmount());
-            String details = expense.getDetails();
-            String categories = expense.getCategories();
-            if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.fragment_transaction_expandable_item_clicked, null);
-            }
-            TextView transactionDate = view.findViewById(R.id.transaction_item_date);
-            transactionDate.setText(date);
-            TextView transactionAmount = view.findViewById(R.id.transaction_item_amount);
-            transactionAmount.setText(amount);
-            TextView transactionCategories = view.findViewById(R.id.transaction_item_category);
-            transactionCategories.setText(categories);
-            TextView transactionDetails = view.findViewById(R.id.transaction_item_details);
-            transactionDetails.setText(details);
-
-            //TODO: delete later
-//            view.findViewById(R.id.transaction_item_delete).setVisibility(View.VISIBLE);
-
-            return view;
-        }
-
-        @Override
-        public boolean isChildSelectable(int i, int i1) {
-            return false;
-        }
-
-        /****************** Helper Methods for CustomExpandableListAdapter ******************/
-        public void createMap(List<Expense> expenses) {
-            for (Expense e : expenses) {
-                addToExpenses(e);
-            }
-        }
-
-        private void addToExpenses(Expense expense) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(new Date(expense.getDate()));
-            String month = getMonthString(cal.get(Calendar.MONTH)) + " " + cal.get(Calendar.YEAR);
-            List<Expense> tmp = mExpenses.get(month);
-            if (tmp == null) {
-                mExpenses.put(month, new ArrayList<>());
-                tmp = mExpenses.get(month);
-                mMonths.add(month);
-            }
-            tmp.add(expense);
-        }
-
-        public void updateItems() {
-            Expense expense = mViewModel.getNewExpense();
-            if (expense != null) {
-                addToExpenses(expense);
-                // clear so that it would not be added again to transactions
-                mViewModel.setNewExpense(null);
-            }
-            notifyDataSetChanged();
-        }
-    }
 
     @Nullable
     @Override
@@ -255,9 +126,223 @@ public class TransactionFragment extends Fragment {
         return month;
     }
 
+    private int getMonthInt(String month) {
+        switch (month) {
+            case "January":
+                return 0;
+            case "February":
+                return 1;
+            case "March":
+                return 2;
+            case "April":
+                return 3;
+            case "May":
+                return 4;
+            case "June":
+                return 5;
+            case "July":
+                return 6;
+            case "August":
+                return 7;
+            case "September":
+                return 8;
+            case "October":
+                return 9;
+            case "November":
+                return 10;
+            case "December":
+            default:
+                return 11;
+        }
+    }
+
     public void collapseAll() {
         for (int i = 0; i < mExpandableListView.getExpandableListAdapter().getGroupCount(); i++) {
             mExpandableListView.collapseGroup(i);
+        }
+    }
+
+    public class ExpenseComparator implements Comparator<Expense> {
+        @Override
+        public int compare(Expense o1, Expense o2) {
+            return 0;
+        }
+    }
+
+    public class MonthYearComparator implements Comparator<String> {
+
+        @Override
+        public int compare(String o2, String o1) {
+            String[] s1 = o1.split(" ");
+            String[] s2 = o2.split(" ");
+            int result = compareYear(s1[1], s2[1]);
+            if (result == 0) {
+                // only need to compare month if they are in the same year
+                result = compareMonth(s1[0], s2[0]);
+            }
+            return result;
+        }
+
+        private int compareMonth(String m1, String m2) {
+            int month1 = getMonthInt(m1);
+            int month2 = getMonthInt(m2);
+            if (month1 < month2) {
+                return -1;
+            } else if (month1 > month2) {
+                return 1;
+            }
+            return 0;
+        }
+
+        private int compareYear(String y1, String y2) {
+            try {
+                int year1 = Integer.parseInt(y1);
+                int year2 = Integer.parseInt(y2);
+                if (year1 < year2) {
+                    return -1;
+                } else if (year1 == year2) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException("Invalid INT to be converted to Year.");
+            }
+        }
+    }
+
+    public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
+        Context mContext;
+        HashMap<String, List<Expense>> mExpenses;
+        List<String> mMonths;
+        HashMap<String, Double> mMonthsAmount;
+
+        public CustomExpandableListAdapter(Context context, List<Expense> expenses) {
+            this.mContext = context;
+            this.mExpenses = new HashMap<>();
+            this.mMonths = new ArrayList<>();
+            this.mMonthsAmount = new HashMap<>();
+            createMap(expenses);
+        }
+
+        @Override
+        public int getGroupCount() {
+            return mExpenses.size();
+        }
+
+        @Override
+        public int getChildrenCount(int i) {
+            // 	getChildrenCount(int groupPosition)
+            return mExpenses.get(mMonths.get(i)).size();
+        }
+
+        @Override
+        public Object getGroup(int i) {
+            return mMonths.get(i);
+        }
+
+        @Override
+        public Object getChild(int i, int i1) {
+            // getChild(int groupPosition, int childPosition)
+            return mExpenses.get(mMonths.get(i)).get(i1);
+        }
+
+        @Override
+        public long getGroupId(int i) {
+            return i;
+        }
+
+        @Override
+        public long getChildId(int i, int i1) {
+            return i1;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return false;
+        }
+
+        @Override
+        public View getGroupView(int i, boolean b, View view, ViewGroup viewGroup) {
+            String month = (String) getGroup(i);
+            String totalAmount = String.format("$%.2f", mMonthsAmount.get(month));
+            if (view == null) {
+                LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.fragment_transaction_expandable_groups, null);
+            }
+            TextView groupMonth = view.findViewById(R.id.transaction_group_month);
+            groupMonth.setText(month);
+            TextView groupTotalAmt = view.findViewById(R.id.transaction_group_amount);
+            groupTotalAmt.setText(totalAmount);
+            return view;
+        }
+
+        @Override
+        public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
+            Expense expense = (Expense) getChild(i, i1);
+            String date = expense.getDate();
+            String amount = String.format("$%.2f", expense.getAmount());
+            String details = expense.getDetails();
+            String categories = expense.getCategories();
+            if (view == null) {
+                LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.fragment_transaction_expandable_item_clicked, null);
+            }
+            TextView transactionDate = view.findViewById(R.id.transaction_item_date);
+            transactionDate.setText(date);
+            TextView transactionAmount = view.findViewById(R.id.transaction_item_amount);
+            transactionAmount.setText(amount);
+            TextView transactionCategories = view.findViewById(R.id.transaction_item_category);
+            transactionCategories.setText(categories);
+            TextView transactionDetails = view.findViewById(R.id.transaction_item_details);
+            transactionDetails.setText(details);
+
+            //TODO: delete later
+//            view.findViewById(R.id.transaction_item_delete).setVisibility(View.VISIBLE);
+
+            return view;
+        }
+
+        @Override
+        public boolean isChildSelectable(int i, int i1) {
+            return false;
+        }
+
+        /****************** Helper Methods for CustomExpandableListAdapter ******************/
+        public void createMap(List<Expense> expenses) {
+            for (Expense e : expenses) {
+                addToExpenses(e);
+            }
+        }
+
+        private void addToExpenses(Expense expense) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date(expense.getDate()));
+            String month = getMonthString(cal.get(Calendar.MONTH)) + " " + cal.get(Calendar.YEAR);
+            List<Expense> tmp = mExpenses.get(month);
+            // add new key pair
+            if (tmp == null) {
+                mExpenses.put(month, new ArrayList<>());
+                tmp = mExpenses.get(month);
+                mMonths.add(month);
+                mMonthsAmount.put(month, 0.0);
+            }
+            tmp.add(expense);
+            double amount = mMonthsAmount.get(month) + expense.getAmount();
+            mMonthsAmount.remove(month);
+            mMonthsAmount.put(month, amount);
+            // sort according to
+            Collections.sort(mMonths, new MonthYearComparator());
+        }
+
+        public void updateItems() {
+            Expense expense = mViewModel.getNewExpense();
+            if (expense != null) {
+                addToExpenses(expense);
+                // clear so that it would not be added again to transactions
+                mViewModel.setNewExpense(null);
+            }
+            notifyDataSetChanged();
         }
     }
 
