@@ -8,11 +8,14 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import com.zj.android.expensetracker.CustomViewModel;
 import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
 import com.zj.android.expensetracker.models.Expense;
@@ -28,7 +31,56 @@ public class TransactionFragment extends Fragment {
     private ExpandableListView mExpandableListView;
     private View mView;
     private CustomExpandableListAdapter mCustomExpandableListAdapter;
+    private CustomViewModel mViewModel;
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mView = inflater.inflate(R.layout.activity_transaction, container, false);
+        mViewModel = new ViewModelProvider(requireActivity()).get(CustomViewModel.class);
+
+        mExpandableListView = mView.findViewById(R.id.transaction_expandableListView);
+        DatabaseAccessor databaseAccessor = new DatabaseAccessor(getContext());
+
+        List<Expense> expenses = DatabaseAccessor.getExpenses();
+
+        mCustomExpandableListAdapter = new CustomExpandableListAdapter(mView.getContext(), expenses);
+        mExpandableListView.setAdapter(mCustomExpandableListAdapter);
+
+        mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            @Override
+            public void onGroupExpand(int i) {
+                // update expenses
+                List<Expense> expenses = DatabaseAccessor.getExpenses();
+                mCustomExpandableListAdapter.updateItems();
+            }
+        });
+        mExpandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+            @Override
+            public void onGroupCollapse(int i) {
+
+            }
+        });
+//        mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+//            @Override
+//            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+//                Toast.makeText(getContext(),childPosition,Toast.LENGTH_SHORT).show();
+//                v.findViewById(R.id.transaction_item_delete).setVisibility(View.VISIBLE);
+//                v.findViewById(R.id.transaction_item_amount).setVisibility(View.INVISIBLE);
+//                return true;
+//            }
+//        });
+        return mView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // close all expandable lists so that it can refresh
+        collapseAll();
+    }
+
+    /******************************* Helper Methods *******************************/
     private String getMonthString(int num) {
         String month;
         switch (num) {
@@ -74,108 +126,44 @@ public class TransactionFragment extends Fragment {
         return month;
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.activity_transaction, container, false);
-
-        mExpandableListView = mView.findViewById(R.id.transaction_expandableListView);
-        DatabaseAccessor databaseAccessor = new DatabaseAccessor(getContext());
-        List<Expense> expenses = DatabaseAccessor.getExpenses();
-
-        List<String> months = new ArrayList<>();
-        for (Expense e : expenses) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(new Date(e.getDate()));
-            String month = getMonthString(cal.get(Calendar.MONTH)) + " " + cal.get(Calendar.YEAR);
-            if (!months.contains(month)) {
-                months.add(month);
-            }
-        }
-
-        mCustomExpandableListAdapter = new CustomExpandableListAdapter(mView.getContext(), expenses, months);
-        mExpandableListView.setAdapter(mCustomExpandableListAdapter);
-
-        mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-            @Override
-            public void onGroupExpand(int i) {
-                // update expenses
-                List<Expense> expenses = DatabaseAccessor.getExpenses();
-                mCustomExpandableListAdapter.updateItems(expenses);
-            }
-        });
-        mExpandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
-            @Override
-            public void onGroupCollapse(int i) {
-
-            }
-        });
-        return mView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // close all expandable lists so that it can refresh
-        collapseAll();
-    }
-
-    private void collapseAll() {
+    public void collapseAll() {
         for (int i = 0; i < mExpandableListView.getExpandableListAdapter().getGroupCount(); i++) {
             mExpandableListView.collapseGroup(i);
         }
     }
 
     public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
-        Context context;
-        HashMap<String, List<Expense>> expenses;
-        List<String> months;
+        Context mContext;
+        HashMap<String, List<Expense>> mExpenses;
+        List<String> mMonths;
 
-        public CustomExpandableListAdapter(Context context, List<Expense> expenses, List<String> months) {
-            this.context = context;
-            this.months = months;
-            this.expenses = new HashMap<>();
-            createMap(expenses, months);
-        }
-
-        public void createMap(List<Expense> expenses, List<String> months) {
-            for (String s : months) {
-                this.expenses.put(s, new ArrayList<>());
-            }
-            for (Expense e : expenses) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(new Date(e.getDate()));
-                String month = getMonthString(cal.get(Calendar.MONTH)) + " " + cal.get(Calendar.YEAR);
-                List<Expense> tmp = this.expenses.get(month);
-                tmp.add(e);
-            }
-        }
-
-        public void updateItems(List<Expense> expenses) {
-            createMap(expenses, months);
-            notifyDataSetChanged();
+        public CustomExpandableListAdapter(Context context, List<Expense> expenses) {
+            this.mContext = context;
+            this.mExpenses = new HashMap<>();
+            this.mMonths = new ArrayList<>();
+            createMap(expenses);
         }
 
         @Override
         public int getGroupCount() {
-            return months.size();
+            return mExpenses.size();
         }
 
         @Override
         public int getChildrenCount(int i) {
             // 	getChildrenCount(int groupPosition)
-            return expenses.get(months.get(i)).size();
+            return mExpenses.get(mMonths.get(i)).size();
         }
 
         @Override
         public Object getGroup(int i) {
-            return months.get(i);
+            return mMonths.get(i);
         }
 
         @Override
         public Object getChild(int i, int i1) {
             // getChild(int groupPosition, int childPosition)
-            return expenses.get(months.get(i)).get(i1);
+            return mExpenses.get(mMonths.get(i)).get(i1);
         }
 
         @Override
@@ -197,14 +185,13 @@ public class TransactionFragment extends Fragment {
         public View getGroupView(int i, boolean b, View view, ViewGroup viewGroup) {
             String month = (String) getGroup(i);
             double amount = 0.00;
-            List<Expense> currExpenses = expenses.get(months.get(i));
+            List<Expense> currExpenses = mExpenses.get(mMonths.get(i));
             for (Expense e : currExpenses) {
                 amount += e.getAmount();
             }
             String totalAmount = String.format("$%.2f", amount);
-
             if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(R.layout.fragment_transaction_expandable_groups, null);
             }
             TextView groupMonth = view.findViewById(R.id.transaction_group_month);
@@ -222,8 +209,8 @@ public class TransactionFragment extends Fragment {
             String details = expense.getDetails();
             String categories = expense.getCategories();
             if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.fragment_transaction_expandable_item, null);
+                LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.fragment_transaction_expandable_item_clicked, null);
             }
             TextView transactionDate = view.findViewById(R.id.transaction_item_date);
             transactionDate.setText(date);
@@ -234,12 +221,44 @@ public class TransactionFragment extends Fragment {
             TextView transactionDetails = view.findViewById(R.id.transaction_item_details);
             transactionDetails.setText(details);
 
+            //TODO: delete later
+//            view.findViewById(R.id.transaction_item_delete).setVisibility(View.VISIBLE);
+
             return view;
         }
 
         @Override
         public boolean isChildSelectable(int i, int i1) {
             return false;
+        }
+
+        /****************** Helper Methods for CustomExpandableListAdapter ******************/
+        public void createMap(List<Expense> expenses) {
+            for (Expense e : expenses) {
+                addToExpenses(e);
+            }
+        }
+
+        private void addToExpenses(Expense expense) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date(expense.getDate()));
+            String month = getMonthString(cal.get(Calendar.MONTH)) + " " + cal.get(Calendar.YEAR);
+            List<Expense> tmp = mExpenses.get(month);
+            if (tmp == null) {
+                mExpenses.put(month, new ArrayList<>());
+                tmp = mExpenses.get(month);
+                mMonths.add(month);
+            }
+            tmp.add(expense);
+        }
+
+        public void updateItems() {
+            Expense expense = mViewModel.getNewExpense();
+            if (expense != null) {
+                addToExpenses(expense);
+                Toast.makeText(getContext(), expense.getId().toString(), Toast.LENGTH_SHORT).show();
+            }
+            notifyDataSetChanged();
         }
     }
 }

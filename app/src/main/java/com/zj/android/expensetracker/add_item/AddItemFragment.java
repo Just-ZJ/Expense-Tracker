@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.chip.Chip;
@@ -21,6 +22,7 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.zj.android.expensetracker.CustomViewModel;
 import com.zj.android.expensetracker.R;
 import com.zj.android.expensetracker.database.ExpenseDataBase;
 import com.zj.android.expensetracker.models.Expense;
@@ -41,6 +43,7 @@ public class AddItemFragment extends Fragment {
     private ExpenseDataBase mDataBase;
 
     private View mView;
+    private CustomViewModel mViewModel;
 
     private String getDayString(int num) {
         String day;
@@ -90,7 +93,7 @@ public class AddItemFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        mViewModel = new ViewModelProvider(requireActivity()).get(CustomViewModel.class);
         mDataBase = new ExpenseDataBase(this.getContext());
 
         mView = inflater.inflate(R.layout.activity_add_item, container, false);
@@ -170,20 +173,19 @@ public class AddItemFragment extends Fragment {
 
             }
         });
-
         mAddExpenseButton = mView.findViewById(R.id.add_expense_button);
         mAddExpenseButton.setOnClickListener(view -> {
             // add expense to database
             Double amount = Double.valueOf(mAmountEditText.getText().toString());
-
             Expense expense = new Expense();
             expense.setDate(mDateTextView.getText().toString());
             expense.setCategories(mSelectedCategoriesTextView.getText().toString());
             expense.setDetails(mExpenseDetailsEditText.getText().toString());
             expense.setAmount(amount);
-
             mDataBase.addExpense(expense);
-
+            // store expense to viewmodel
+            mViewModel.setNewExpense(expense);
+            // clear form
             clearFields();
             // switch to transaction fragment
             ViewPager2 viewPager2 = getActivity().findViewById(R.id.fragment_container);
