@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,105 +31,6 @@ public class TransactionFragment extends Fragment {
     private View mView;
     private CustomExpandableListAdapter mCustomExpandableListAdapter;
     private CustomViewModel mViewModel;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.activity_transaction, container, false);
-        mViewModel = new ViewModelProvider(requireActivity()).get(CustomViewModel.class);
-
-        mExpandableListView = mView.findViewById(R.id.transaction_expandableListView);
-        DatabaseAccessor databaseAccessor = new DatabaseAccessor(getContext());
-
-        List<Expense> expenses = DatabaseAccessor.getExpenses();
-
-        mCustomExpandableListAdapter = new CustomExpandableListAdapter(mView.getContext(), expenses);
-        mExpandableListView.setAdapter(mCustomExpandableListAdapter);
-
-        mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-            @Override
-            public void onGroupExpand(int i) {
-                // update expenses
-                List<Expense> expenses = DatabaseAccessor.getExpenses();
-                mCustomExpandableListAdapter.updateItems();
-            }
-        });
-        mExpandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
-            @Override
-            public void onGroupCollapse(int i) {
-
-            }
-        });
-//        mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-//            @Override
-//            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-//                Toast.makeText(getContext(),childPosition,Toast.LENGTH_SHORT).show();
-//                v.findViewById(R.id.transaction_item_delete).setVisibility(View.VISIBLE);
-//                v.findViewById(R.id.transaction_item_amount).setVisibility(View.INVISIBLE);
-//                return true;
-//            }
-//        });
-        return mView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // close all expandable lists so that it can refresh
-        collapseAll();
-    }
-
-    /******************************* Helper Methods *******************************/
-    private String getMonthString(int num) {
-        String month;
-        switch (num) {
-            case 0:
-                month = "January";
-                break;
-            case 1:
-                month = "February";
-                break;
-            case 2:
-                month = "March";
-                break;
-            case 3:
-                month = "April";
-                break;
-            case 4:
-                month = "May";
-                break;
-            case 5:
-                month = "June";
-                break;
-            case 6:
-                month = "July";
-                break;
-            case 7:
-                month = "August";
-                break;
-            case 8:
-                month = "September";
-                break;
-            case 9:
-                month = "October";
-                break;
-            case 10:
-                month = "November";
-                break;
-            case 11:
-                month = "December";
-                break;
-            default:
-                month = "Error: Day does not exist";
-        }
-        return month;
-    }
-
-    public void collapseAll() {
-        for (int i = 0; i < mExpandableListView.getExpandableListAdapter().getGroupCount(); i++) {
-            mExpandableListView.collapseGroup(i);
-        }
-    }
 
     public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         Context mContext;
@@ -256,9 +156,110 @@ public class TransactionFragment extends Fragment {
             Expense expense = mViewModel.getNewExpense();
             if (expense != null) {
                 addToExpenses(expense);
-                Toast.makeText(getContext(), expense.getId().toString(), Toast.LENGTH_SHORT).show();
+                // clear so that it would not be added again to transactions
+                mViewModel.setNewExpense(null);
             }
             notifyDataSetChanged();
         }
     }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mView = inflater.inflate(R.layout.activity_transaction, container, false);
+        mViewModel = new ViewModelProvider(requireActivity()).get(CustomViewModel.class);
+
+        mExpandableListView = mView.findViewById(R.id.transaction_expandableListView);
+        DatabaseAccessor databaseAccessor = new DatabaseAccessor(getContext());
+        List<Expense> expenses = DatabaseAccessor.getExpenses();
+
+        mCustomExpandableListAdapter = new CustomExpandableListAdapter(mView.getContext(), expenses);
+        mExpandableListView.setAdapter(mCustomExpandableListAdapter);
+
+        mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            @Override
+            public void onGroupExpand(int i) {
+                // update expenses
+                List<Expense> expenses = DatabaseAccessor.getExpenses();
+                mCustomExpandableListAdapter.updateItems();
+            }
+        });
+        mExpandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+            @Override
+            public void onGroupCollapse(int i) {
+
+            }
+        });
+//        mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+//            @Override
+//            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+//                Toast.makeText(getContext(),childPosition,Toast.LENGTH_SHORT).show();
+//                v.findViewById(R.id.transaction_item_delete).setVisibility(View.VISIBLE);
+//                v.findViewById(R.id.transaction_item_amount).setVisibility(View.INVISIBLE);
+//                return true;
+//            }
+//        });
+        return mView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // close all expandable lists so that it can refresh
+        collapseAll();
+    }
+
+    /******************************* Helper Methods *******************************/
+    private String getMonthString(int num) {
+        String month;
+        switch (num) {
+            case 0:
+                month = "January";
+                break;
+            case 1:
+                month = "February";
+                break;
+            case 2:
+                month = "March";
+                break;
+            case 3:
+                month = "April";
+                break;
+            case 4:
+                month = "May";
+                break;
+            case 5:
+                month = "June";
+                break;
+            case 6:
+                month = "July";
+                break;
+            case 7:
+                month = "August";
+                break;
+            case 8:
+                month = "September";
+                break;
+            case 9:
+                month = "October";
+                break;
+            case 10:
+                month = "November";
+                break;
+            case 11:
+                month = "December";
+                break;
+            default:
+                month = "Error: Day does not exist";
+        }
+        return month;
+    }
+
+    public void collapseAll() {
+        for (int i = 0; i < mExpandableListView.getExpandableListAdapter().getGroupCount(); i++) {
+            mExpandableListView.collapseGroup(i);
+        }
+    }
+
+
 }
