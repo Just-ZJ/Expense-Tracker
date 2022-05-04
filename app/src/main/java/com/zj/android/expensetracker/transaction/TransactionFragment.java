@@ -2,6 +2,7 @@ package com.zj.android.expensetracker.transaction;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,18 +59,29 @@ public class TransactionFragment extends Fragment {
         mExpandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
             @Override
             public void onGroupCollapse(int i) {
-
+                mCustomExpandableListAdapter.updateItems();
             }
         });
-//        mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-//            @Override
-//            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-//                Toast.makeText(getContext(),childPosition,Toast.LENGTH_SHORT).show();
-//                v.findViewById(R.id.transaction_item_delete).setVisibility(View.VISIBLE);
-//                v.findViewById(R.id.transaction_item_amount).setVisibility(View.INVISIBLE);
-//                return true;
-//            }
-//        });
+        mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                Log.i("result1", "onChildClick: pressed");
+                int tmp = v.findViewById(R.id.transaction_item_delete).getVisibility();
+                if (tmp == View.VISIBLE) {
+                    v.findViewById(R.id.transaction_item_delete).setVisibility(View.INVISIBLE);
+                } else {
+                    v.findViewById(R.id.transaction_item_delete).setVisibility(View.VISIBLE);
+                }
+
+                tmp = v.findViewById(R.id.transaction_item_amount).getVisibility();
+                if (tmp == View.VISIBLE) {
+                    v.findViewById(R.id.transaction_item_amount).setVisibility(View.INVISIBLE);
+                } else {
+                    v.findViewById(R.id.transaction_item_amount).setVisibility(View.VISIBLE);
+                }
+                return true;
+            }
+        });
         return mView;
     }
 
@@ -297,15 +309,12 @@ public class TransactionFragment extends Fragment {
             TextView transactionDetails = view.findViewById(R.id.transaction_item_details);
             transactionDetails.setText(details);
 
-            //TODO: delete later
-//            view.findViewById(R.id.transaction_item_delete).setVisibility(View.VISIBLE);
-
             return view;
         }
 
         @Override
         public boolean isChildSelectable(int i, int i1) {
-            return false;
+            return true;
         }
 
         /****************** Helper Methods for CustomExpandableListAdapter ******************/
