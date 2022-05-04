@@ -5,4 +5,5 @@
     <string name="hint_expense_details">Details</string>
     <string name="label_selected_categories">Category: </string>
     <string name="button_add_item">Add Expense</string>
+    <string name="button_delete_transaction">DELETE</string>
 </resources>

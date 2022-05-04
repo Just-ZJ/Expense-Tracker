@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
@@ -66,11 +67,11 @@ public class TransactionFragment extends Fragment {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 Log.i("result1", "onChildClick: pressed");
-                int tmp = v.findViewById(R.id.transaction_item_delete).getVisibility();
+                int tmp = v.findViewById(R.id.button_delete_transaction).getVisibility();
                 if (tmp == View.VISIBLE) {
-                    v.findViewById(R.id.transaction_item_delete).setVisibility(View.INVISIBLE);
+                    v.findViewById(R.id.button_delete_transaction).setVisibility(View.INVISIBLE);
                 } else {
-                    v.findViewById(R.id.transaction_item_delete).setVisibility(View.VISIBLE);
+                    v.findViewById(R.id.button_delete_transaction).setVisibility(View.VISIBLE);
                 }
 
                 tmp = v.findViewById(R.id.transaction_item_amount).getVisibility();
@@ -309,6 +310,17 @@ public class TransactionFragment extends Fragment {
             TextView transactionDetails = view.findViewById(R.id.transaction_item_details);
             transactionDetails.setText(details);
 
+            Button deleteButton = view.findViewById(R.id.button_delete_transaction);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.i("delete button", "onClick: " + expense.getId() + ", "
+                            + expense.getDate() + ", " + expense.getAmount());
+                    removeFromExpenses(expense);
+                    DatabaseAccessor.removeExpense(expense);
+                }
+            });
+
             return view;
         }
 
@@ -321,6 +333,26 @@ public class TransactionFragment extends Fragment {
         public void createMap(List<Expense> expenses) {
             for (Expense e : expenses) {
                 addToExpenses(e);
+            }
+        }
+
+        private void removeFromExpenses(Expense expense) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date(expense.getDate()));
+            String month = getMonthString(cal.get(Calendar.MONTH)) + " " + cal.get(Calendar.YEAR);
+            //remove from expenses
+            List<Expense> tmp = mExpenses.get(month);
+            tmp.remove(expense);
+            if (tmp.size() > 0) {
+                // transactions still exists for this group
+                // decrement by expense amount
+                double amount = mMonthsAmount.get(month) - expense.getAmount();
+                mMonthsAmount.remove(month);
+                mMonthsAmount.put(month, amount);
+            } else {
+                // no more transactions for this group
+                mMonthsAmount.remove(month);
+                mMonths.remove(month);
             }
         }
 
@@ -337,6 +369,7 @@ public class TransactionFragment extends Fragment {
                 mMonthsAmount.put(month, 0.0);
             }
             tmp.add(expense);
+            // increment by expense amount
             double amount = mMonthsAmount.get(month) + expense.getAmount();
             mMonthsAmount.remove(month);
             mMonthsAmount.put(month, amount);

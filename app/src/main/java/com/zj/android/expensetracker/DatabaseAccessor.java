@@ -35,6 +35,25 @@ public class DatabaseAccessor {
         return new DatabaseCursorWrapper(cursor);
     }
 
+    public static void removeExpense(Expense expense) {
+        String whereClause = ExpenseTable.Cols.UUID + " = ?";
+        String[] whereArgs = new String[]{expense.getId().toString()};
+        mExpenseDataBase.delete(ExpenseTable.NAME, whereClause, whereArgs);
+    }
+
+    public static Expense getExpense(String uuid) {
+        String whereClause = ExpenseTable.Cols.UUID + " = ?";
+        String[] whereArgs = new String[]{uuid};
+        DatabaseCursorWrapper cursor = queryExpense(whereClause, whereArgs);
+        try {
+            cursor.moveToFirst();
+            Expense expense = cursor.getExpense();
+            return expense;
+        } finally {
+            cursor.close();
+        }
+    }
+
     public static List<Expense> getExpenses() {
         List<Expense> expenses = new ArrayList<>();
         DatabaseCursorWrapper cursor = queryExpense(null, null);
