@@ -1,8 +1,8 @@
 package com.zj.android.expensetracker.database;
 
-
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -28,26 +28,21 @@ public class CategoryDataBase extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("create table " + CategoryTable.NAME + "(" +
-                " _id integer primary key autoincrement, " +
-                Cols.UUID + ", " +
-                Cols.NAME +
+                " id integer primary key autoincrement, " +
+                Cols.UUID + " not null unique, " +
+                Cols.NAME + " varchar(25) not null unique " +
                 ")"
         );
     }
 
     public void addCategory(Category category) {
         SQLiteDatabase database = this.getWritableDatabase();
-        database.insert(CategoryTable.NAME, null, getContentValues(category));
-        database.close();
-    }
-
-    public void updateCategory() {
-        SQLiteDatabase database = this.getWritableDatabase();
-        database.close();
-    }
-
-    public void removeCategory() {
-        SQLiteDatabase database = this.getWritableDatabase();
+        try {
+            database.insert(CategoryTable.NAME, null, getContentValues(category));
+        } catch (SQLiteConstraintException e) {
+            // do nothing.
+            // TODO: alert user if they added duplicated categories maybe? check if user added using boolean?
+        }
         database.close();
     }
 

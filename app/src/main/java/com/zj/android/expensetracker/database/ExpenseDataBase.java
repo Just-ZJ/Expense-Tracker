@@ -29,11 +29,11 @@ public class ExpenseDataBase extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("create table " + ExpenseTable.NAME + "(" +
-                " _id integer primary key autoincrement, " +
-                Cols.UUID + ", " +
-                Cols.DATE + ", " +
+                " id integer primary key autoincrement, " +
+                Cols.UUID + " not null unique, " +
+                Cols.DATE + " not null, " +
                 Cols.DETAILS + ", " +
-                Cols.AMOUNT +
+                Cols.AMOUNT + " not null" +
                 ")"
         );
     }
@@ -45,11 +45,6 @@ public class ExpenseDataBase extends SQLiteOpenHelper {
     }
 
     public void updateExpense() {
-        SQLiteDatabase database = this.getWritableDatabase();
-        database.close();
-    }
-
-    public void removeExpense() {
         SQLiteDatabase database = this.getWritableDatabase();
         database.close();
     }

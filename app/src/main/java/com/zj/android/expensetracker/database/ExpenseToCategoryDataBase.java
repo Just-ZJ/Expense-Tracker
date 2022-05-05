@@ -28,10 +28,10 @@ public class ExpenseToCategoryDataBase extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("create table " + ExpenseToCategoryTable.NAME + "(" +
-                " _id integer primary key autoincrement, " +
-                Cols.UUID + ", " +
-                Cols.EXPENSE_ID + ", " +
-                Cols.CATEGORY_ID +
+                " id integer primary key autoincrement, " +
+                Cols.UUID + " not null unique, " +
+                Cols.EXPENSE_ID + " not null, " +
+                Cols.CATEGORY_ID + " not null " +
                 ")"
         );
     }
