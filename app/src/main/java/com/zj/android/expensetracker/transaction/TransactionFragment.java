@@ -61,31 +61,9 @@ public class TransactionFragment extends Fragment {
         mExpandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
             @Override
             public void onGroupCollapse(int i) {
-                mCustomExpandableListAdapter.updateItems();
+
             }
         });
-//        mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-//            @Override
-//            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-//                Log.i("result2", "groupPosition: " + groupPosition + ", childPosition: " + childPosition
-//                        + ", " + id);
-//
-//                Button deleteButton = v.findViewById(R.id.button_delete_transaction);
-//                if (deleteButton.getVisibility() == View.VISIBLE) {
-//                    deleteButton.setVisibility(View.INVISIBLE);
-//                } else {
-//                    deleteButton.setVisibility(View.VISIBLE);
-//                }
-//
-////                TextView amountTextView = v.findViewById(R.id.transaction_item_amount);
-////                if (amountTextView.getVisibility() == View.VISIBLE) {
-////                    amountTextView.setVisibility(View.INVISIBLE);
-////                } else {
-////                    amountTextView.setVisibility(View.VISIBLE);
-////                }
-//                return true;
-//            }
-//        });
         return mView;
     }
 
@@ -94,12 +72,15 @@ public class TransactionFragment extends Fragment {
         super.onResume();
         // close all expandable lists so that it can refresh
         collapseAll();
+        mCustomExpandableListAdapter.updateItems();
     }
 
     /******************************* Helper Methods *******************************/
-    private String getMonthString(int num) {
+    private String getMonthString(Expense expense) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date(expense.getDate()));
         String month;
-        switch (num) {
+        switch (cal.get(Calendar.MONTH)) {
             case 0:
                 month = "January";
                 break;
@@ -134,12 +115,10 @@ public class TransactionFragment extends Fragment {
                 month = "November";
                 break;
             case 11:
-                month = "December";
-                break;
             default:
-                month = "Error: Day does not exist";
+                month = "December";
         }
-        return month;
+        return month + " " + cal.get(Calendar.YEAR);
     }
 
     private int getMonthInt(String month) {
@@ -243,13 +222,17 @@ public class TransactionFragment extends Fragment {
 
         @Override
         public int getGroupCount() {
-            return mExpenses.size();
+            return mMonths.size();
         }
 
         @Override
         public int getChildrenCount(int i) {
             // 	getChildrenCount(int groupPosition)
-            return mExpenses.get(mMonths.get(i)).size();
+            List<Expense> tmp = mExpenses.get(getGroup(i));
+            if (tmp != null) {
+                return tmp.size();
+            }
+            return 1;
         }
 
         /**
@@ -258,13 +241,21 @@ public class TransactionFragment extends Fragment {
          */
         @Override
         public Object getGroup(int i) {
-            return mMonths.get(i);
+            try {
+                return mMonths.get(i);
+            } catch (IndexOutOfBoundsException e) {
+                return "Empty Group";
+            }
         }
 
         @Override
         public Object getChild(int i, int i1) {
             // getChild(int groupPosition, int childPosition)
-            return mExpenses.get(mMonths.get(i)).get(i1);
+            List<Expense> tmp = mExpenses.get(getGroup(i));
+            if (tmp != null) {
+                return tmp.get(i1);
+            }
+            return null;
         }
 
         @Override
@@ -285,6 +276,10 @@ public class TransactionFragment extends Fragment {
         @Override
         public View getGroupView(int i, boolean b, View view, ViewGroup viewGroup) {
             String month = (String) getGroup(i);
+            if (month.equals("Empty Group")) {
+                LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                return inflater.inflate(R.layout.fragment_transaction_empty, null);
+            }
             String totalAmount = String.format("$%.2f", mMonthsAmount.get(month));
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -300,6 +295,10 @@ public class TransactionFragment extends Fragment {
         @Override
         public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
             Expense expense = (Expense) getChild(i, i1);
+            if (expense == null) {
+                LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                return inflater.inflate(R.layout.fragment_transaction_empty, null);
+            }
             String date = expense.getDate();
             String amount = String.format("$%.2f", expense.getAmount());
             String details = expense.getDetails();
@@ -352,9 +351,7 @@ public class TransactionFragment extends Fragment {
         }
 
         private void removeFromExpenses(Expense expense) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(new Date(expense.getDate()));
-            String month = getMonthString(cal.get(Calendar.MONTH)) + " " + cal.get(Calendar.YEAR);
+            String month = getMonthString(expense);
             //remove from expenses
             List<Expense> tmp = mExpenses.get(month);
             tmp.remove(expense);
@@ -366,15 +363,15 @@ public class TransactionFragment extends Fragment {
                 mMonthsAmount.put(month, amount);
             } else {
                 // no more transactions for this group
+                mExpenses.remove(month);
                 mMonthsAmount.remove(month);
                 mMonths.remove(month);
             }
+            notifyDataSetChanged();
         }
 
         private void addToExpenses(Expense expense) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(new Date(expense.getDate()));
-            String month = getMonthString(cal.get(Calendar.MONTH)) + " " + cal.get(Calendar.YEAR);
+            String month = getMonthString(expense);
             List<Expense> tmp = mExpenses.get(month);
             // add new key pair
             if (tmp == null) {
@@ -390,6 +387,7 @@ public class TransactionFragment extends Fragment {
             mMonthsAmount.put(month, amount);
             // sort according to
             Collections.sort(mMonths, new MonthYearComparator());
+            notifyDataSetChanged();
         }
 
         public void updateItems() {
@@ -399,7 +397,6 @@ public class TransactionFragment extends Fragment {
                 // clear so that it would not be added again to transactions
                 mViewModel.setNewExpense(null);
             }
-            notifyDataSetChanged();
         }
     }
 
