@@ -23,8 +23,11 @@ import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.zj.android.expensetracker.CustomViewModel;
+import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
+import com.zj.android.expensetracker.database.CategoryDataBase;
 import com.zj.android.expensetracker.database.ExpenseDataBase;
+import com.zj.android.expensetracker.models.Category;
 import com.zj.android.expensetracker.models.Expense;
 
 import java.util.Calendar;
@@ -40,7 +43,8 @@ public class AddItemFragment extends Fragment {
     private EditText mExpenseDetailsEditText;
     private EditText mAmountEditText;
     private Button mAddExpenseButton;
-    private ExpenseDataBase mDataBase;
+    private ExpenseDataBase mExpenseDataBase;
+    private CategoryDataBase mCategoryDataBase;
 
     private View mView;
     private CustomViewModel mViewModel;
@@ -94,7 +98,10 @@ public class AddItemFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mViewModel = new ViewModelProvider(requireActivity()).get(CustomViewModel.class);
-        mDataBase = new ExpenseDataBase(this.getContext());
+
+        DatabaseAccessor databaseAccessor = new DatabaseAccessor(getContext());
+        mExpenseDataBase = new ExpenseDataBase(this.getContext());
+        mCategoryDataBase = new CategoryDataBase(this.getContext());
 
         mView = inflater.inflate(R.layout.activity_add_item, container, false);
         mDateTextView = mView.findViewById(R.id.textView_date);
@@ -182,7 +189,7 @@ public class AddItemFragment extends Fragment {
             expense.setCategories(mSelectedCategoriesTextView.getText().toString());
             expense.setDetails(mExpenseDetailsEditText.getText().toString());
             expense.setAmount(amount);
-            mDataBase.addExpense(expense);
+            mExpenseDataBase.addExpense(expense);
             // store expense to viewmodel
             mViewModel.setNewExpense(expense);
             // clear form
@@ -225,14 +232,22 @@ public class AddItemFragment extends Fragment {
         mSelectedCategoriesTextView.setText(text.toString());
     }
 
+    private void addDefaultCategories() {
+        String[] defaultCategories = new String[]{"Grocery", "Fuel", "Dining",
+                "Subscriptions", "Miscellaneous"};
+        for (String s : defaultCategories) {
+            Category category = new Category();
+            category.setName(s);
+            mCategoryDataBase.addCategory(category);
+        }
+    }
+
     private void populateChipGroup() {
-        //        TODO: change this to create from an array of values
-        //        TODO: change this to using database
-        mCategoriesChipGroup.addView(addChip("Grocery"));
-        mCategoriesChipGroup.addView(addChip("Fuel"));
-        mCategoriesChipGroup.addView(addChip("Dining"));
-        mCategoriesChipGroup.addView(addChip("Subscriptions"));
-        mCategoriesChipGroup.addView(addChip("Miscellaneous"));
+        addDefaultCategories();
+        String[] categories = DatabaseAccessor.getCategories();
+        for (String s : categories) {
+            mCategoriesChipGroup.addView(addChip(s));
+        }
     }
 
     private Chip addChip(String category) {
