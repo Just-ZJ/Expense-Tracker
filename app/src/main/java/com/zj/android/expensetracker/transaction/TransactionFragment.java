@@ -1,14 +1,14 @@
 package com.zj.android.expensetracker.transaction;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.zj.android.expensetracker.CustomViewModel;
 import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
@@ -63,26 +64,28 @@ public class TransactionFragment extends Fragment {
                 mCustomExpandableListAdapter.updateItems();
             }
         });
-        mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                Log.i("result1", "onChildClick: pressed");
-                int tmp = v.findViewById(R.id.button_delete_transaction).getVisibility();
-                if (tmp == View.VISIBLE) {
-                    v.findViewById(R.id.button_delete_transaction).setVisibility(View.INVISIBLE);
-                } else {
-                    v.findViewById(R.id.button_delete_transaction).setVisibility(View.VISIBLE);
-                }
-
-                tmp = v.findViewById(R.id.transaction_item_amount).getVisibility();
-                if (tmp == View.VISIBLE) {
-                    v.findViewById(R.id.transaction_item_amount).setVisibility(View.INVISIBLE);
-                } else {
-                    v.findViewById(R.id.transaction_item_amount).setVisibility(View.VISIBLE);
-                }
-                return true;
-            }
-        });
+//        mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+//            @Override
+//            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+//                Log.i("result2", "groupPosition: " + groupPosition + ", childPosition: " + childPosition
+//                        + ", " + id);
+//
+//                Button deleteButton = v.findViewById(R.id.button_delete_transaction);
+//                if (deleteButton.getVisibility() == View.VISIBLE) {
+//                    deleteButton.setVisibility(View.INVISIBLE);
+//                } else {
+//                    deleteButton.setVisibility(View.VISIBLE);
+//                }
+//
+////                TextView amountTextView = v.findViewById(R.id.transaction_item_amount);
+////                if (amountTextView.getVisibility() == View.VISIBLE) {
+////                    amountTextView.setVisibility(View.INVISIBLE);
+////                } else {
+////                    amountTextView.setVisibility(View.VISIBLE);
+////                }
+//                return true;
+//            }
+//        });
         return mView;
     }
 
@@ -249,6 +252,10 @@ public class TransactionFragment extends Fragment {
             return mExpenses.get(mMonths.get(i)).size();
         }
 
+        /**
+         * Gets the heading for the group
+         * Ex: May 2022
+         */
         @Override
         public Object getGroup(int i) {
             return mMonths.get(i);
@@ -299,8 +306,9 @@ public class TransactionFragment extends Fragment {
             String categories = expense.getCategories();
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.fragment_transaction_expandable_item_clicked, null);
+                view = inflater.inflate(R.layout.fragment_transaction_expandable_item, null);
             }
+
             TextView transactionDate = view.findViewById(R.id.transaction_item_date);
             transactionDate.setText(date);
             TextView transactionAmount = view.findViewById(R.id.transaction_item_amount);
@@ -310,16 +318,23 @@ public class TransactionFragment extends Fragment {
             TextView transactionDetails = view.findViewById(R.id.transaction_item_details);
             transactionDetails.setText(details);
 
-            Button deleteButton = view.findViewById(R.id.button_delete_transaction);
-            deleteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.i("delete button", "onClick: " + expense.getId() + ", "
-                            + expense.getDate() + ", " + expense.getAmount());
-                    removeFromExpenses(expense);
-                    DatabaseAccessor.removeExpense(expense);
-                }
-            });
+            ImageButton deleteButton = view.findViewById(R.id.button_delete_transaction);
+            deleteButton.setOnClickListener(v -> new MaterialAlertDialogBuilder(getContext())
+                    .setTitle("Are you sure you want to delete this expense?")
+                    .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // do nothing
+                        }
+                    }).setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // delete expense
+                            removeFromExpenses(expense);
+                            DatabaseAccessor.removeExpense(expense);
+                            updateItems();
+                        }
+                    }).show());
 
             return view;
         }
