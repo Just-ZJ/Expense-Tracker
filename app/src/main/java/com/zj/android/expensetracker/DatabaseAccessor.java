@@ -42,6 +42,12 @@ public class DatabaseAccessor {
         return new DatabaseCursorWrapper(cursor);
     }
 
+    public static void removeCategory(String name) {
+        String whereClause = CategoryTable.Cols.NAME + " = ?";
+        String[] whereArgs = new String[]{name};
+        mCategoryDataBase.delete(CategoryTable.NAME, whereClause, whereArgs);
+    }
+
     public static void removeExpense(Expense expense) {
         String whereClause = ExpenseTable.Cols.UUID + " = ?";
         String[] whereArgs = new String[]{expense.getId().toString()};
@@ -90,4 +96,6 @@ public class DatabaseAccessor {
                 whereArgs, null, null, null);
         return new DatabaseCursorWrapper(cursor);
     }
+
+
 }

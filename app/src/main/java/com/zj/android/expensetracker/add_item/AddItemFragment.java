@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -292,9 +291,10 @@ public class AddItemFragment extends Fragment {
             newChip.setOnCloseIconClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //TODO: delete category
-                    Log.i("dialog", "onClick: pressed " + newChip.getText());
-//                    DatabaseAccessor.removeCategory();
+                    // remove from chip group
+                    mCategoriesChipGroup.removeView(v);
+                    // remove from database
+                    DatabaseAccessor.removeCategory(newChip.getText().toString());
                 }
             });
         }
