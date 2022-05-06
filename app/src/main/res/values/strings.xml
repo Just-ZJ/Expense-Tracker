@@ -6,4 +6,7 @@
     <string name="label_selected_categories">Category: </string>
     <string name="button_add_item">Add Expense</string>
     <string name="button_delete_transaction">DELETE</string>
+    <string name="dialog_add_category_message">Please enter the name of a category:</string>
+    <string name="dialog_add_category_hint">Enter category</string>
+    <string name="dialog_add_category_maxChars_helperText">Maximum Characters</string>
 </resources>

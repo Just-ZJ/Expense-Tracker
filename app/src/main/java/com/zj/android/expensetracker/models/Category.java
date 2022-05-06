@@ -15,6 +15,11 @@ public class Category {
         this(UUID.randomUUID());
     }
 
+    public Category(String name) {
+        this(UUID.randomUUID());
+        setName(name);
+    }
+
     public UUID getId() {
         return mId;
     }

@@ -1,8 +1,10 @@
 package com.zj.android.expensetracker.add_item;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,8 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputLayout;
 import com.zj.android.expensetracker.CustomViewModel;
 import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
@@ -201,7 +205,6 @@ public class AddItemFragment extends Fragment {
         return mView;
     }
 
-
     private void clearFields() {
         mSelectedCategoriesTextView.setText("");
         mExpenseDetailsEditText.setText("");
@@ -246,16 +249,55 @@ public class AddItemFragment extends Fragment {
         addDefaultCategories();
         String[] categories = DatabaseAccessor.getCategories();
         for (String s : categories) {
-            mCategoriesChipGroup.addView(addChip(s));
+            mCategoriesChipGroup.addView(addChip(s, false));
         }
+        mCategoriesChipGroup.addView(addChip("Add +", true));
     }
 
-    private Chip addChip(String category) {
+    private Chip addChip(String category, boolean isAdd) {
         LayoutInflater inflater = LayoutInflater.from(mView.getContext());
         Chip newChip = (Chip) inflater.inflate(R.layout.fragment_add_item_add_chip, this.mCategoriesChipGroup, false);
         newChip.setText(category);
-        // updates mSelectedCategoriesTextView to show what is selected
-        newChip.setOnClickListener(view -> updateSelectedCategoriesTextView(category));
+        if (isAdd) {
+            newChip.setOnClickListener(view -> {
+                View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_categories, null);
+                new MaterialAlertDialogBuilder(getContext())
+                        .setView(dialogView)
+                        .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                // do nothing
+                            }
+                        })
+                        .setPositiveButton("Add Category", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                TextInputLayout textInputLayout = dialogView.findViewById(R.id.add_category_editText);
+                                String inputText = textInputLayout.getEditText().getText().toString();
+                                // add to chip group, just before Add +
+                                mCategoriesChipGroup.addView(addChip(inputText, false),
+                                        mCategoriesChipGroup.getChildCount() - 1);
+                                // add to database
+                                mCategoryDataBase.addCategory(new Category(inputText));
+                            }
+                        })
+                        .show();
+
+            });
+            newChip.setCheckable(false);
+            newChip.setCloseIconVisible(false);
+        } else {
+            // updates textview to show what is selected
+            newChip.setOnClickListener(view -> updateSelectedCategoriesTextView(category));
+            newChip.setOnCloseIconClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //TODO: delete category
+                    Log.i("dialog", "onClick: pressed " + newChip.getText());
+//                    DatabaseAccessor.removeCategory();
+                }
+            });
+        }
         return newChip;
     }
 }
