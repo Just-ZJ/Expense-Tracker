@@ -18,6 +18,14 @@ public class Expense {
         this(UUID.randomUUID());
     }
 
+    public Expense(String date, String categories, String details, Double amount) {
+        this(UUID.randomUUID());
+        setDate(date);
+        setCategories(categories);
+        setDetails(details);
+        setAmount(amount);
+    }
+
     public UUID getId() {
         return mId;
     }
