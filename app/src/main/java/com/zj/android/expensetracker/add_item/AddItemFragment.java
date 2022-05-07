@@ -282,9 +282,7 @@ public class AddItemFragment extends Fragment {
      */
     private void addDefaultCategories() {
         for (String s : DEFAULT_CATEGORIES) {
-            Category category = new Category();
-            category.setName(s);
-            mCategoryDataBase.addCategory(category);
+            mCategoryDataBase.addCategory(new Category(s));
         }
     }
 
@@ -297,14 +295,14 @@ public class AddItemFragment extends Fragment {
         for (String s : categories) {
             mCategoriesChipGroup.addView(addChip(s, false));
         }
-        mCategoriesChipGroup.addView(addChip("Add +", true));
+        mCategoriesChipGroup.addView(addChip("Add Category", true));
     }
 
     /**
      * Creates chips with category names
      *
      * @param category the category name
-     * @param isAdd    indicates whether {@code category}  is "Add +"
+     * @param isAdd    indicates whether {@code category}  is "Add Category"
      * @return the chip created
      */
     private Chip addChip(String category, boolean isAdd) {
@@ -312,10 +310,10 @@ public class AddItemFragment extends Fragment {
         Chip newChip = (Chip) inflater.inflate(R.layout.fragment_add_item_add_chip, this.mCategoriesChipGroup, false);
         newChip.setText(category);
         if (isAdd) {
-            // customize "Add +" chip
+            // customize "Add Category" chip
             newChip.setOnClickListener(view -> createAddChipDialog());
             newChip.setCheckable(false);
-            newChip.setCloseIconVisible(false);
+            newChip.setCloseIcon(getResources().getDrawable(R.drawable.ic_add));
         } else {
             // customize all other chips
             if (Arrays.asList(DEFAULT_CATEGORIES).contains(category)) {
@@ -329,7 +327,7 @@ public class AddItemFragment extends Fragment {
     }
 
     /**
-     * Creates dialog for user to add category when the "Add +" chip is clicked
+     * Creates dialog for user to add category when the "Add Category" chip is clicked
      */
     private void createAddChipDialog() {
         // inflate view beforehand for setPositiveButton OnClickListener
@@ -342,7 +340,7 @@ public class AddItemFragment extends Fragment {
                 .setPositiveButton("Add Category", (dialogInterface, i) -> {
                     TextInputLayout textInputLayout = dialogView.findViewById(R.id.add_category_editText);
                     String inputText = textInputLayout.getEditText().getText().toString();
-                    // add to chip group, just before "Add +"
+                    // add to chip group, just before "Add Category"
                     mCategoriesChipGroup.addView(addChip(inputText, false),
                             mCategoriesChipGroup.getChildCount() - 1);
                     // add to database
