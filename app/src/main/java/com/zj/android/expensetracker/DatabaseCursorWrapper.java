@@ -45,8 +45,8 @@ public class DatabaseCursorWrapper extends CursorWrapper {
 
     public ExpenseToCategory getExpenseToCategory() {
         String uuidString = getString(getColumnIndex(ExpenseToCategoryTable.Cols.UUID));
-        String expenseId = getString(getColumnIndex(ExpenseToCategoryTable.Cols.EXPENSE_ID));
-        String categoryId = getString(getColumnIndex(ExpenseToCategoryTable.Cols.CATEGORY_ID));
+        String expenseId = getString(getColumnIndex(ExpenseToCategoryTable.Cols.EXPENSE_UUID));
+        String categoryId = getString(getColumnIndex(ExpenseToCategoryTable.Cols.CATEGORY_UUID));
 
         ExpenseToCategory expenseToCategory = new ExpenseToCategory(UUID.fromString(uuidString));
         expenseToCategory.setExpenseId(UUID.fromString(expenseId));

@@ -28,12 +28,12 @@ public class ExpenseDataBase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("create table " + ExpenseTable.NAME + "(" +
-                " id integer primary key autoincrement, " +
-                Cols.UUID + " not null unique, " +
-                Cols.DATE + " not null, " +
-                Cols.DETAILS + ", " +
-                Cols.AMOUNT + " not null" +
+        sqLiteDatabase.execSQL("CREATE TABLE " + ExpenseTable.NAME + "(" +
+                " id integer PRIMARY KEY autoincrement, " +
+                Cols.UUID + " text NOT NULL UNIQUE, " +
+                Cols.DATE + " NOT NULL, " +
+                Cols.DETAILS + " text, " +
+                Cols.AMOUNT + " NOT NULL" +
                 ")"
         );
     }
@@ -41,11 +41,6 @@ public class ExpenseDataBase extends SQLiteOpenHelper {
     public void addExpense(Expense expense) {
         SQLiteDatabase database = this.getWritableDatabase();
         database.insert(ExpenseTable.NAME, null, getContentValues(expense));
-        database.close();
-    }
-
-    public void updateExpense() {
-        SQLiteDatabase database = this.getWritableDatabase();
         database.close();
     }
 

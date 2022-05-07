@@ -28,9 +28,9 @@ public class CategoryDataBase extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("create table " + CategoryTable.NAME + "(" +
-                " id integer primary key autoincrement, " +
-                Cols.UUID + " not null unique, " +
-                Cols.NAME + " varchar(25) not null unique " +
+                " id integer PRIMARY KEY autoincrement, " +
+                Cols.UUID + " text NOT NULL UNIQUE, " +
+                Cols.NAME + " varchar(25) NOT NULL UNIQUE " +
                 ")"
         );
     }

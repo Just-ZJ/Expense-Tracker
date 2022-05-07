@@ -7,8 +7,8 @@ public class ExpenseToCategoryDbSchema {
         // all unique categories of expenses
         public static final class Cols {
             public static final String UUID = "uuid";
-            public static final String EXPENSE_ID = "expense_id";
-            public static final String CATEGORY_ID = "category_id";
+            public static final String EXPENSE_UUID = "expense_uuid";
+            public static final String CATEGORY_UUID = "category_uuid";
         }
     }
 }
