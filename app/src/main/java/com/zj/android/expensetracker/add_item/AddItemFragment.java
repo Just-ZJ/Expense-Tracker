@@ -1,6 +1,5 @@
 package com.zj.android.expensetracker.add_item;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -33,12 +32,15 @@ import com.zj.android.expensetracker.database.ExpenseDataBase;
 import com.zj.android.expensetracker.models.Category;
 import com.zj.android.expensetracker.models.Expense;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 public class AddItemFragment extends Fragment {
 
+    private final String[] DEFAULT_CATEGORIES = new String[]{"Grocery", "Fuel", "Dining",
+            "Subscriptions", "Miscellaneous"};
     private TextView mDateTextView;
     private ImageView mSelectDateImageView;
     private TextView mSelectedCategoriesTextView;
@@ -48,7 +50,6 @@ public class AddItemFragment extends Fragment {
     private Button mAddExpenseButton;
     private ExpenseDataBase mExpenseDataBase;
     private CategoryDataBase mCategoryDataBase;
-
     private View mView;
     private CustomViewModel mViewModel;
 
@@ -234,70 +235,90 @@ public class AddItemFragment extends Fragment {
         mSelectedCategoriesTextView.setText(text.toString());
     }
 
+    /**
+     * Adds the default categories to database if it does not already exist
+     */
     private void addDefaultCategories() {
-        String[] defaultCategories = new String[]{"Grocery", "Fuel", "Dining",
-                "Subscriptions", "Miscellaneous"};
-        for (String s : defaultCategories) {
+        for (String s : DEFAULT_CATEGORIES) {
             Category category = new Category();
             category.setName(s);
             mCategoryDataBase.addCategory(category);
         }
     }
 
+    /**
+     * Populates chip group with categories in the database
+     */
     private void populateChipGroup() {
         addDefaultCategories();
         String[] categories = DatabaseAccessor.getCategories();
         for (String s : categories) {
-            mCategoriesChipGroup.addView(addChip(s, false));
+            mCategoriesChipGroup.addView(addChip(s, false, true));
         }
-        mCategoriesChipGroup.addView(addChip("Add +", true));
+        mCategoriesChipGroup.addView(addChip("Add +", true, false));
     }
 
-    private Chip addChip(String category, boolean isAdd) {
+    /**
+     * Creates chips with category names
+     *
+     * @param category  the category name
+     * @param isAdd     indicates whether {@code category}  is "Add +"
+     * @param isDefault indicates whether {@code category} is in the array {@code DEFAULT_CATEGORIES}
+     * @return the chip created
+     */
+    private Chip addChip(String category, boolean isAdd, boolean isDefault) {
         LayoutInflater inflater = LayoutInflater.from(mView.getContext());
         Chip newChip = (Chip) inflater.inflate(R.layout.fragment_add_item_add_chip, this.mCategoriesChipGroup, false);
         newChip.setText(category);
         if (isAdd) {
-            newChip.setOnClickListener(view -> {
-                View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_categories, null);
-                new MaterialAlertDialogBuilder(getContext())
-                        .setView(dialogView)
-                        .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                // do nothing
-                            }
-                        })
-                        .setPositiveButton("Add Category", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                TextInputLayout textInputLayout = dialogView.findViewById(R.id.add_category_editText);
-                                String inputText = textInputLayout.getEditText().getText().toString();
-                                // add to chip group, just before Add +
-                                mCategoriesChipGroup.addView(addChip(inputText, false),
-                                        mCategoriesChipGroup.getChildCount() - 1);
-                                // add to database
-                                mCategoryDataBase.addCategory(new Category(inputText));
-                            }
-                        })
-                        .show();
-
-            });
+            // customize "Add +" chip
+            newChip.setOnClickListener(view -> createAddChipDialog());
             newChip.setCheckable(false);
             newChip.setCloseIconVisible(false);
         } else {
-            // updates textview to show what is selected
+            // customize all other chips
+            if (Arrays.asList(DEFAULT_CATEGORIES).contains(category)) {
+                // customize default chips
+                newChip.setCloseIconVisible(false);
+            }
             newChip.setOnClickListener(view -> updateSelectedCategoriesTextView(category));
-            newChip.setOnCloseIconClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // remove from chip group
-                    mCategoriesChipGroup.removeView(v);
-                    // remove from database
-                    DatabaseAccessor.removeCategory(newChip.getText().toString());
-                }
-            });
+            newChip.setOnCloseIconClickListener(v -> removeChip(v, newChip.getText().toString()));
         }
         return newChip;
+    }
+
+    /**
+     * Creates dialog for user to add category when the "Add +" chip is clicked
+     */
+    private void createAddChipDialog() {
+        // inflate view beforehand for setPositiveButton OnClickListener
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_categories, null);
+        new MaterialAlertDialogBuilder(getContext())
+                .setView(dialogView)
+                .setNeutralButton("Cancel", (dialogInterface, i) -> {
+                    // do nothing
+                })
+                .setPositiveButton("Add Category", (dialogInterface, i) -> {
+                    TextInputLayout textInputLayout = dialogView.findViewById(R.id.add_category_editText);
+                    String inputText = textInputLayout.getEditText().getText().toString();
+                    // add to chip group, just before "Add +"
+                    mCategoriesChipGroup.addView(addChip(inputText, false, false),
+                            mCategoriesChipGroup.getChildCount() - 1);
+                    // add to database
+                    mCategoryDataBase.addCategory(new Category(inputText));
+                })
+                .show();
+    }
+
+    /**
+     * Removes chip completely when it is deleted by the user
+     */
+    private void removeChip(View v, String categoryName) {
+        // remove from chip group
+        mCategoriesChipGroup.removeView(v);
+        // remove from textview
+        updateSelectedCategoriesTextView(categoryName);
+        // remove from database
+        DatabaseAccessor.removeCategory(categoryName);
     }
 }
