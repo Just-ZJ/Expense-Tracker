@@ -16,6 +16,12 @@ public class ExpenseToCategory {
         this(UUID.randomUUID());
     }
 
+    public ExpenseToCategory(UUID expenseId, UUID categoryId) {
+        this(UUID.randomUUID());
+        setExpenseId(expenseId);
+        setCategoryId(categoryId);
+    }
+
     public UUID getId() {
         return mId;
     }

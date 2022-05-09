@@ -29,13 +29,16 @@ import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
 import com.zj.android.expensetracker.database.CategoryDataBase;
 import com.zj.android.expensetracker.database.ExpenseDataBase;
+import com.zj.android.expensetracker.database.ExpenseToCategoryDataBase;
 import com.zj.android.expensetracker.models.Category;
 import com.zj.android.expensetracker.models.Expense;
+import com.zj.android.expensetracker.models.ExpenseToCategory;
 
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.UUID;
 
 public class AddItemFragment extends Fragment {
 
@@ -50,6 +53,7 @@ public class AddItemFragment extends Fragment {
     private Button mAddExpenseButton;
     private ExpenseDataBase mExpenseDataBase;
     private CategoryDataBase mCategoryDataBase;
+    private ExpenseToCategoryDataBase mExpenseToCategoryDataBase;
     private View mView;
     private CustomViewModel mViewModel;
 
@@ -61,6 +65,7 @@ public class AddItemFragment extends Fragment {
         DatabaseAccessor databaseAccessor = new DatabaseAccessor(requireContext());
         mExpenseDataBase = new ExpenseDataBase(this.getContext());
         mCategoryDataBase = new CategoryDataBase(this.getContext());
+        mExpenseToCategoryDataBase = new ExpenseToCategoryDataBase(this.getContext());
 
         mView = inflater.inflate(R.layout.activity_add_item, container, false);
         mDateTextView = mView.findViewById(R.id.textView_date);
@@ -121,8 +126,15 @@ public class AddItemFragment extends Fragment {
                     mSelectedCategoriesTextView.getText().toString(),
                     mExpenseDetailsEditText.getText().toString(),
                     Double.valueOf(mAmountEditText.getText().toString()));
-            // add expense to database
+            // add expense to databases
             mExpenseDataBase.addExpense(expense);
+            String[] categories = expense.getCategories().split(", ");
+            for (String s : categories) {
+                Category category = DatabaseAccessor.getCategoryByName(s);
+                ExpenseToCategory expenseToCategory = new ExpenseToCategory(
+                        UUID.fromString(expense.getId().toString()), UUID.fromString(category.getId().toString()));
+                mExpenseToCategoryDataBase.addCategory(expenseToCategory);
+            }
             // store expense to view model
             mViewModel.setNewExpense(expense);
             // clear form

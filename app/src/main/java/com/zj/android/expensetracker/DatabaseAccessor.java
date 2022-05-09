@@ -12,6 +12,7 @@ import com.zj.android.expensetracker.database.ExpenseToCategoryDataBase;
 import com.zj.android.expensetracker.database.ExpenseToCategoryDbSchema.ExpenseToCategoryTable;
 import com.zj.android.expensetracker.models.Category;
 import com.zj.android.expensetracker.models.Expense;
+import com.zj.android.expensetracker.models.ExpenseToCategory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,11 +43,12 @@ public class DatabaseAccessor {
         return new DatabaseCursorWrapper(cursor);
     }
 
-    public static void removeCategory(String name) {
-        String whereClause = CategoryTable.Cols.NAME + " = ?";
-        String[] whereArgs = new String[]{name};
-        mCategoryDataBase.delete(CategoryTable.NAME, whereClause, whereArgs);
+    private static DatabaseCursorWrapper queryExpenseToCategory(String whereClause, String[] whereArgs) {
+        Cursor cursor = mExpenseToCategoryDataBase.query(ExpenseToCategoryTable.NAME, null, whereClause,
+                whereArgs, null, null, null);
+        return new DatabaseCursorWrapper(cursor);
     }
+
 
     public static void removeExpense(Expense expense) {
         String whereClause = ExpenseTable.Cols.UUID + " = ?";
@@ -67,6 +69,18 @@ public class DatabaseAccessor {
             cursor.close();
         }
         return expenses;
+    }
+
+    public static Category getCategoryByUUID(String uuid) {
+        DatabaseCursorWrapper cursor = queryCategory(CategoryTable.Cols.UUID + " =? ", new String[]{uuid});
+        cursor.moveToFirst();
+        return cursor.getCategory();
+    }
+
+    public static Category getCategoryByName(String name) {
+        DatabaseCursorWrapper cursor = queryCategory(CategoryTable.Cols.NAME + " =? ", new String[]{name});
+        cursor.moveToFirst();
+        return cursor.getCategory();
     }
 
     public static int getCategoriesCount() {
@@ -91,11 +105,31 @@ public class DatabaseAccessor {
         return categories;
     }
 
-    private DatabaseCursorWrapper queryExpenseToCategory(String whereClause, String[] whereArgs) {
-        Cursor cursor = mExpenseToCategoryDataBase.query(ExpenseToCategoryTable.NAME, null, whereClause,
-                whereArgs, null, null, null);
-        return new DatabaseCursorWrapper(cursor);
+    public static void removeCategory(String name) {
+        String whereClause = CategoryTable.Cols.NAME + " = ?";
+        String[] whereArgs = new String[]{name};
+        mCategoryDataBase.delete(CategoryTable.NAME, whereClause, whereArgs);
     }
 
+    public static String getExpenseCategories(Expense expense) {
+        String categories = "";
+        String whereClause = ExpenseToCategoryTable.Cols.EXPENSE_UUID + " = ?";
+        String[] whereArgs = new String[]{expense.getId().toString()};
+        DatabaseCursorWrapper cursor = queryExpenseToCategory(whereClause, whereArgs);
+        try {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                if (!cursor.isFirst()) {
+                    categories += ", ";
+                }
+                ExpenseToCategory expenseToCategory = cursor.getExpenseToCategory();
+                categories += getCategoryByUUID(expenseToCategory.getCategoryId().toString()).getName();
+                cursor.moveToNext();
+            }
+        } finally {
+            cursor.close();
+        }
+        return categories;
+    }
 
 }
