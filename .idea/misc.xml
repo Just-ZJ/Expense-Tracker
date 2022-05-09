@@ -35,7 +35,7 @@
         <entry key="..\:/D_Drive_Folders/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_add_item_add_chip.xml" value="0.264" />
         <entry key="..\:/D_Drive_Folders/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_transaction_empty.xml" value="0.25416666666666665" />
         <entry key="..\:/D_Drive_Folders/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_transaction_expandable_groups.xml" value="0.13489583333333333" />
-        <entry key="..\:/D_Drive_Folders/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_transaction_expandable_item.xml" value="0.264" />
+        <entry key="..\:/D_Drive_Folders/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_transaction_expandable_item.xml" value="0.536" />
         <entry key="..\:/D_Drive_Folders/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/layout/fragment_transaction_expandable_item_clicked.xml" value="0.264" />
         <entry key="..\:/D_Drive_Folders/AndroidStudioWorkspace/ExpenseTracker/app/src/main/res/menu/menu_bottom_navigation.xml" value="0.125" />
       </map>
@@ -46,5 +46,12 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.536" />
+      </ProjectState>
+    </option>
   </component>
 </project>
