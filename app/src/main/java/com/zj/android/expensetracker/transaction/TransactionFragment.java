@@ -44,7 +44,7 @@ public class TransactionFragment extends Fragment {
         mViewModel = new ViewModelProvider(requireActivity()).get(CustomViewModel.class);
 
         mExpandableListView = mView.findViewById(R.id.transaction_expandableListView);
-        DatabaseAccessor databaseAccessor = new DatabaseAccessor(getContext());
+        DatabaseAccessor databaseAccessor = new DatabaseAccessor(requireContext());
         List<Expense> expenses = DatabaseAccessor.getExpenses();
 
         mCustomExpandableListAdapter = new CustomExpandableListAdapter(mView.getContext(), expenses);
@@ -75,7 +75,7 @@ public class TransactionFragment extends Fragment {
         mCustomExpandableListAdapter.updateItems();
     }
 
-    /******************************* Helper Methods *******************************/
+    /*------------------------------ Helper Methods ------------------------------*/
     private String getMonthString(Expense expense) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date(expense.getDate()));
@@ -302,12 +302,11 @@ public class TransactionFragment extends Fragment {
             String date = expense.getDate();
             String amount = String.format("$%.2f", expense.getAmount());
             String details = expense.getDetails();
-            String categories = expense.getCategories();
+            String categories = DatabaseAccessor.getExpenseCategories(expense);
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(R.layout.fragment_transaction_expandable_item, null);
             }
-
             TextView transactionDate = view.findViewById(R.id.transaction_item_date);
             transactionDate.setText(date);
             TextView transactionAmount = view.findViewById(R.id.transaction_item_amount);
@@ -318,7 +317,7 @@ public class TransactionFragment extends Fragment {
             transactionDetails.setText(details);
 
             ImageButton deleteButton = view.findViewById(R.id.button_delete_transaction);
-            deleteButton.setOnClickListener(v -> new MaterialAlertDialogBuilder(getContext())
+            deleteButton.setOnClickListener(v -> new MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Are you sure you want to delete this expense?")
                     .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
