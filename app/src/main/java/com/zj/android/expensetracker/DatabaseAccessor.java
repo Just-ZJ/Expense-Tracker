@@ -37,6 +37,11 @@ public class DatabaseAccessor {
         return new DatabaseCursorWrapper(cursor);
     }
 
+//    private static DatabaseCursorWrapper queryExpenseYear(String sql, String[] whereArgs) {
+//        Cursor cursor = mExpenseDataBase.rawQuery(sql, whereArgs);
+//        return new DatabaseCursorWrapper(cursor);
+//    }
+
     private static DatabaseCursorWrapper queryCategory(String whereClause, String[] whereArgs) {
         Cursor cursor = mCategoryDataBase.query(CategoryTable.NAME, null, whereClause,
                 whereArgs, null, null, null);
@@ -48,7 +53,6 @@ public class DatabaseAccessor {
                 whereArgs, null, null, null);
         return new DatabaseCursorWrapper(cursor);
     }
-
 
     public static void removeExpense(Expense expense) {
         String whereClause = ExpenseTable.Cols.UUID + " = ?";
@@ -70,6 +74,27 @@ public class DatabaseAccessor {
         }
         return expenses;
     }
+
+//    public static List<String> getYears(){
+//        List<String> years = new ArrayList<>();
+//        String sql = "SELECT * FROM ( SELECT distinct " + ExpenseTable.Cols.DATE + " FROM " + ExpenseTable.NAME + ") ";
+//        String[] whereArgs = new String[]{};
+//        DatabaseCursorWrapper cursor = queryExpenseYear(sql, whereArgs);
+//
+//        try {
+//            cursor.moveToFirst();
+//            int i = 0;
+//            while (!cursor.isAfterLast()) {
+//                String date = cursor.getString(cursor.getColumnIndex(ExpenseTable.Cols.DATE));
+//                String year = date.substring(date.length() - 4);
+//                Log.i("tryout1", "getYears: " + year);
+//                cursor.moveToNext();
+//            }
+//        } finally {
+//            cursor.close();
+//        }
+//        return years;
+//    }
 
     public static Category getCategoryByUUID(String uuid) {
         DatabaseCursorWrapper cursor = queryCategory(CategoryTable.Cols.UUID + " =? ", new String[]{uuid});
