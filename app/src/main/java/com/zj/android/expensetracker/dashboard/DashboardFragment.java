@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -21,6 +22,9 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.android.material.tabs.TabLayout;
+import com.zj.android.expensetracker.CustomViewModel;
+import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
 
 import java.util.ArrayList;
@@ -30,12 +34,20 @@ import java.util.List;
 public class DashboardFragment extends Fragment {
 
     private View mView;
+    private CustomViewModel mViewModel;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         mView = inflater.inflate(R.layout.activity_dashboard, container, false);
+        mViewModel = new ViewModelProvider(requireActivity()).get(CustomViewModel.class);
+        DatabaseAccessor databaseAccessor = new DatabaseAccessor(requireContext());
+
+        TabLayout tabLayout = mView.findViewById(R.id.graph_tab_layout);
+        createAndAddTab(tabLayout, "2022");
+        DatabaseAccessor.getYears();
+
 
         // get height of device
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -84,7 +96,14 @@ public class DashboardFragment extends Fragment {
         return mView;
     }
 
-    /************************* Bar Chart Helper Methods ***************************************/
+    /*------------------------------ Helper Methods ------------------------------*/
+    private void createAndAddTab(TabLayout tabLayout, String year) {
+        TabLayout.Tab tab = tabLayout.newTab();
+        tab.setText(year);
+        tabLayout.addTab(tab);
+    }
+
+    /*------------------------------ Bar Chart Helper Methods ------------------------------*/
     private List<BarEntry> setupBarData() {
         List<BarEntry> entries = new ArrayList<>();
         // NOTE: Order of the entries added determines their position.
@@ -158,7 +177,7 @@ public class DashboardFragment extends Fragment {
         barChart.setDrawBarShadow(false);
     }
 
-    /************************* Pie Chart Helper Methods ***************************************/
+    /*------------------------------ Pie Chart Helper Methods ------------------------------*/
     private List<PieEntry> setupPieData() {
         List<PieEntry> entries = new ArrayList<>();
         // NOTE: Order of the entries added determines their position.
