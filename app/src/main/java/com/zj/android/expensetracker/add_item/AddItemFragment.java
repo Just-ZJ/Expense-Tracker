@@ -22,6 +22,7 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.zj.android.expensetracker.CustomViewModel;
@@ -36,8 +37,8 @@ import com.zj.android.expensetracker.models.ExpenseToCategory;
 
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.UUID;
 
 public class AddItemFragment extends Fragment {
@@ -56,6 +57,49 @@ public class AddItemFragment extends Fragment {
     private ExpenseToCategoryDataBase mExpenseToCategoryDataBase;
     private View mView;
     private CustomViewModel mViewModel;
+    private Calendar mCalendarSelectedDate;
+
+    /*------------------------------ Helper Methods ------------------------------*/
+
+    /**
+     * Converts a number from 1-7, to a day in a week that it corresponds to
+     *
+     * @param num a number from 1-7
+     * @return day of the week
+     */
+    public static String getDayString(int num) {
+        switch (num) {
+            case Calendar.SUNDAY:
+                return "Sunday";
+            case Calendar.MONDAY:
+                return "Monday";
+            case Calendar.TUESDAY:
+                return "Tuesday";
+            case Calendar.WEDNESDAY:
+                return "Wednesday";
+            case Calendar.THURSDAY:
+                return "Thursday";
+            case Calendar.FRIDAY:
+                return "Friday";
+            case Calendar.SATURDAY:
+                return "Saturday";
+        }
+        return null;
+    }
+
+    /**
+     * Returns a string that is in the format of eg. Friday, 5/6/2022
+     *
+     * @param day   the day of the week
+     * @param month the month
+     * @param date  the date
+     * @param year  the year
+     * @return a string that is in the format of "Friday, 5/6/2022"
+     */
+    public static String formatDate(int day, int month, int date, int year) {
+        return String.format(Locale.ENGLISH, "%s, %d/%d/%d",
+                getDayString(day), month + 1, date, year);
+    }
 
     @Nullable
     @Override
@@ -71,15 +115,17 @@ public class AddItemFragment extends Fragment {
         mDateTextView = mView.findViewById(R.id.textView_date);
 
         // set to today's date
-        Calendar cal = Calendar.getInstance();
+        mCalendarSelectedDate = Calendar.getInstance(TimeZone.getDefault());
         try {
-            mDateTextSetDate(cal);
+            mDateTextSetDate(mCalendarSelectedDate);
+            // offset to ensure DatePicker is not shown as 1 day ahead
+            mCalendarSelectedDate.add(Calendar.DATE, -1);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         mSelectDateImageView = mView.findViewById(R.id.imageView_select_date);
-        mSelectDateImageView.setOnClickListener(view -> createDatePicker(cal));
+        mSelectDateImageView.setOnClickListener(view -> createDatePicker());
 
         mSelectedCategoriesTextView = mView.findViewById(R.id.textView_selected_categories);
         mCategoriesChipGroup = mView.findViewById(R.id.chipGroup_expense_category);
@@ -122,7 +168,7 @@ public class AddItemFragment extends Fragment {
         });
         mAddExpenseButton = mView.findViewById(R.id.add_expense_button);
         mAddExpenseButton.setOnClickListener(view -> {
-            Expense expense = new Expense(mDateTextView.getText().toString(),
+            Expense expense = new Expense(mCalendarSelectedDate.getTimeInMillis(),
                     mSelectedCategoriesTextView.getText().toString(),
                     mExpenseDetailsEditText.getText().toString(),
                     Double.valueOf(mAmountEditText.getText().toString()));
@@ -137,6 +183,7 @@ public class AddItemFragment extends Fragment {
             }
             // store expense to view model
             mViewModel.setNewExpense(expense);
+
             // clear form
             clearFields();
             // switch to transaction fragment
@@ -146,96 +193,39 @@ public class AddItemFragment extends Fragment {
         return mView;
     }
 
-    /*------------------------------ Helper Methods ------------------------------*/
-
     /**
      * Creates a DatePicker object for the user to select the date of their expense
-     *
-     * @param cal a Calendar object
      */
-    private void createDatePicker(Calendar cal) {
+    private void createDatePicker() {
         // set to only being able to select dates before today's date
         CalendarConstraints constraints = new CalendarConstraints.Builder()
                 .setValidator(DateValidatorPointBackward.now())
                 .build();
 
-        MaterialDatePicker<?> datePicker = MaterialDatePicker.Builder.datePicker()
+        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select Date")
-                .setSelection(cal.getTimeInMillis())
+                .setSelection(mCalendarSelectedDate.getTimeInMillis())
                 .setCalendarConstraints(constraints)
                 .build();
 
         // open and show the date picker fragment
-        datePicker.show(getActivity().getSupportFragmentManager(), null);
-
+        datePicker.show(requireActivity().getSupportFragmentManager(), null);
         // change date to what the user selected
-        datePicker.addOnPositiveButtonClickListener(listener -> {
-            try {
-                // set to selected date
-                long dateVal = Long.parseLong(datePicker.getSelection().toString());
-                cal.setTime(new Date(dateVal));
-            } catch (NumberFormatException e) {
-                throw new NumberFormatException("Invalid Date from MaterialDatePicker.");
+        datePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
+            @Override
+            public void onPositiveButtonClick(Long selection) {
+                mCalendarSelectedDate.setTimeInMillis(selection);
+                try {
+                    // offset to show correct date in text
+                    mCalendarSelectedDate.add(Calendar.DATE, 1);
+                    mDateTextSetDate(mCalendarSelectedDate);
+                    mCalendarSelectedDate.add(Calendar.DATE, -1);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
-            // offset by 1 day to show date correctly in text
-            cal.add(Calendar.DATE, 1);
-            try {
-                mDateTextSetDate(cal);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            cal.add(Calendar.DATE, -1);
         });
-    }
-
-    /**
-     * Converts a number from 1-7, to a day in a week that it corresponds to
-     *
-     * @param num a number from 1-7
-     * @return day of the week
-     */
-    private String getDayString(int num) throws Exception {
-        String day;
-        switch (num) {
-            case 1:
-                day = "Sunday";
-                break;
-            case 2:
-                day = "Monday";
-                break;
-            case 3:
-                day = "Tuesday";
-                break;
-            case 4:
-                day = "Wednesday";
-                break;
-            case 5:
-                day = "Thursday";
-                break;
-            case 6:
-                day = "Friday";
-                break;
-            case 7:
-                day = "Saturday";
-                break;
-            default:
-                throw new Exception("Error: Day does not exist");
-        }
-        return day;
-    }
-
-    /**
-     * Returns a string that is in the format of eg. Friday, 5/6/2022
-     *
-     * @param day   the day of the week
-     * @param month the month
-     * @param date  the date
-     * @param year  the year
-     * @return a string that is in the format of "Friday, 5/6/2022"
-     */
-    private String formatDate(int day, int month, int date, int year) throws Exception {
-        return String.format(Locale.ENGLISH, "%s, %d/%d/%d",
-                getDayString(day), month + 1, date, year);
     }
 
     /**
@@ -243,9 +233,10 @@ public class AddItemFragment extends Fragment {
      *
      * @param cal a calendar object
      */
-    private void mDateTextSetDate(Calendar cal) throws Exception {
+    private void mDateTextSetDate(Calendar cal) {
+        // offset date by 1 to show correct date in text
         mDateTextView.setText(formatDate(cal.get(Calendar.DAY_OF_WEEK), cal.get(Calendar.MONTH),
-                cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.YEAR)));
+                cal.get(Calendar.DATE), cal.get(Calendar.YEAR)));
     }
 
     /**

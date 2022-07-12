@@ -10,6 +10,7 @@ import com.zj.android.expensetracker.models.Category;
 import com.zj.android.expensetracker.models.Expense;
 import com.zj.android.expensetracker.models.ExpenseToCategory;
 
+import java.util.Date;
 import java.util.UUID;
 
 public class DatabaseCursorWrapper extends CursorWrapper {
@@ -31,12 +32,12 @@ public class DatabaseCursorWrapper extends CursorWrapper {
 
     public Expense getExpense() {
         String uuidString = getString(getColumnIndex(ExpenseTable.Cols.UUID));
-        String date = getString(getColumnIndex(ExpenseTable.Cols.DATE));
+        long date = getLong(getColumnIndex(ExpenseTable.Cols.DATE));
         String details = getString(getColumnIndex(ExpenseTable.Cols.DETAILS));
         String amount = getString(getColumnIndex(ExpenseTable.Cols.AMOUNT));
 
         Expense expense = new Expense(UUID.fromString(uuidString));
-        expense.setDate(date);
+        expense.setDate(new Date(date));
         expense.setDetails(details);
         expense.setAmount(Double.parseDouble(amount));
 

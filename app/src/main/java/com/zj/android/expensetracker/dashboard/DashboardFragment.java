@@ -46,7 +46,7 @@ public class DashboardFragment extends Fragment {
 
         TabLayout tabLayout = mView.findViewById(R.id.graph_tab_layout);
         createAndAddTab(tabLayout, "2022");
-        DatabaseAccessor.getYears();
+//        DatabaseAccessor.getYears();
 
 
         // get height of device

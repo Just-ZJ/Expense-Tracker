@@ -20,15 +20,16 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.zj.android.expensetracker.CustomViewModel;
 import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
+import com.zj.android.expensetracker.add_item.AddItemFragment;
 import com.zj.android.expensetracker.models.Expense;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 
 public class TransactionFragment extends Fragment {
 
@@ -77,44 +78,44 @@ public class TransactionFragment extends Fragment {
 
     /*------------------------------ Helper Methods ------------------------------*/
     private String getMonthString(Expense expense) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date(expense.getDate()));
+        Calendar cal = Calendar.getInstance(TimeZone.getDefault());
+        cal.setTimeInMillis(expense.getDate().getTime());
         String month;
         switch (cal.get(Calendar.MONTH)) {
-            case 0:
+            case Calendar.JANUARY:
                 month = "January";
                 break;
-            case 1:
+            case Calendar.FEBRUARY:
                 month = "February";
                 break;
-            case 2:
+            case Calendar.MARCH:
                 month = "March";
                 break;
-            case 3:
+            case Calendar.APRIL:
                 month = "April";
                 break;
-            case 4:
+            case Calendar.MAY:
                 month = "May";
                 break;
-            case 5:
+            case Calendar.JUNE:
                 month = "June";
                 break;
-            case 6:
+            case Calendar.JULY:
                 month = "July";
                 break;
-            case 7:
+            case Calendar.AUGUST:
                 month = "August";
                 break;
-            case 8:
+            case Calendar.SEPTEMBER:
                 month = "September";
                 break;
-            case 9:
+            case Calendar.OCTOBER:
                 month = "October";
                 break;
-            case 10:
+            case Calendar.NOVEMBER:
                 month = "November";
                 break;
-            case 11:
+            case Calendar.DECEMBER:
             default:
                 month = "December";
         }
@@ -299,7 +300,8 @@ public class TransactionFragment extends Fragment {
                 LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 return inflater.inflate(R.layout.fragment_transaction_empty, null);
             }
-            String date = expense.getDate();
+            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            cal.setTime(expense.getDate());
             String amount = String.format("$%.2f", expense.getAmount());
             String details = expense.getDetails();
             String categories = DatabaseAccessor.getExpenseCategories(expense);
@@ -308,7 +310,12 @@ public class TransactionFragment extends Fragment {
                 view = inflater.inflate(R.layout.fragment_transaction_expandable_item, null);
             }
             TextView transactionDate = view.findViewById(R.id.transaction_item_date);
-            transactionDate.setText(date);
+            try {
+                transactionDate.setText(AddItemFragment.formatDate(cal.get(Calendar.DAY_OF_WEEK), cal.get(Calendar.MONTH),
+                        cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.YEAR)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             TextView transactionAmount = view.findViewById(R.id.transaction_item_amount);
             transactionAmount.setText(amount);
             TextView transactionCategories = view.findViewById(R.id.transaction_item_category);
@@ -397,6 +404,8 @@ public class TransactionFragment extends Fragment {
                 mViewModel.setNewExpense(null);
             }
         }
+
+
     }
 
 

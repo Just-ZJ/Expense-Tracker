@@ -1,11 +1,12 @@
 package com.zj.android.expensetracker.models;
 
+import java.util.Date;
 import java.util.UUID;
 
 public class Expense {
 
     private final UUID mId;
-    private String mDate;
+    private Date mDate;
     private String mCategories;
     private String mDetails;
     private Double mAmount;
@@ -18,9 +19,9 @@ public class Expense {
         this(UUID.randomUUID());
     }
 
-    public Expense(String date, String categories, String details, Double amount) {
+    public Expense(long date, String categories, String details, Double amount) {
         this(UUID.randomUUID());
-        setDate(date);
+        setDate(new Date(date));
         setCategories(categories);
         setDetails(details);
         setAmount(amount);
@@ -30,11 +31,11 @@ public class Expense {
         return mId;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return mDate;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         mDate = date;
     }
 
