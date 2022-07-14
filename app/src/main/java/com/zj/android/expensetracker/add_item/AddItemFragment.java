@@ -25,6 +25,7 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
+import com.zj.android.expensetracker.CustomDate;
 import com.zj.android.expensetracker.CustomViewModel;
 import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
@@ -37,7 +38,6 @@ import com.zj.android.expensetracker.models.ExpenseToCategory;
 
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Locale;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -59,48 +59,6 @@ public class AddItemFragment extends Fragment {
     private CustomViewModel mViewModel;
     private Calendar mCalendarSelectedDate;
 
-    /*------------------------------ Helper Methods ------------------------------*/
-
-    /**
-     * Converts a number from 1-7, to a day in a week that it corresponds to
-     *
-     * @param num a number from 1-7
-     * @return day of the week
-     */
-    public static String getDayString(int num) {
-        switch (num) {
-            case Calendar.SUNDAY:
-                return "Sunday";
-            case Calendar.MONDAY:
-                return "Monday";
-            case Calendar.TUESDAY:
-                return "Tuesday";
-            case Calendar.WEDNESDAY:
-                return "Wednesday";
-            case Calendar.THURSDAY:
-                return "Thursday";
-            case Calendar.FRIDAY:
-                return "Friday";
-            case Calendar.SATURDAY:
-                return "Saturday";
-        }
-        return null;
-    }
-
-    /**
-     * Returns a string that is in the format of eg. Friday, 5/6/2022
-     *
-     * @param day   the day of the week
-     * @param month the month
-     * @param date  the date
-     * @param year  the year
-     * @return a string that is in the format of "Friday, 5/6/2022"
-     */
-    public static String formatDate(int day, int month, int date, int year) {
-        return String.format(Locale.ENGLISH, "%s, %d/%d/%d",
-                getDayString(day), month + 1, date, year);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -118,8 +76,6 @@ public class AddItemFragment extends Fragment {
         mCalendarSelectedDate = Calendar.getInstance(TimeZone.getDefault());
         try {
             mDateTextSetDate(mCalendarSelectedDate);
-            // offset to ensure DatePicker is not shown as 1 day ahead
-            mCalendarSelectedDate.add(Calendar.DATE, -1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -168,7 +124,7 @@ public class AddItemFragment extends Fragment {
         });
         mAddExpenseButton = mView.findViewById(R.id.add_expense_button);
         mAddExpenseButton.setOnClickListener(view -> {
-            Expense expense = new Expense(mCalendarSelectedDate.getTimeInMillis(),
+            Expense expense = new Expense(new CustomDate(mCalendarSelectedDate),
                     mSelectedCategoriesTextView.getText().toString(),
                     mExpenseDetailsEditText.getText().toString(),
                     Double.valueOf(mAmountEditText.getText().toString()));
@@ -193,6 +149,8 @@ public class AddItemFragment extends Fragment {
         return mView;
     }
 
+    /*------------------------------ Helper Methods ------------------------------*/
+
     /**
      * Creates a DatePicker object for the user to select the date of their expense
      */
@@ -204,7 +162,7 @@ public class AddItemFragment extends Fragment {
 
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select Date")
-                .setSelection(mCalendarSelectedDate.getTimeInMillis())
+                .setSelection(Calendar.getInstance().getTimeInMillis())
                 .setCalendarConstraints(constraints)
                 .build();
 
@@ -215,15 +173,14 @@ public class AddItemFragment extends Fragment {
             @Override
             public void onPositiveButtonClick(Long selection) {
                 mCalendarSelectedDate.setTimeInMillis(selection);
+                //offset to store correct date
+                mCalendarSelectedDate.add(Calendar.DATE, 1);
                 try {
                     // offset to show correct date in text
-                    mCalendarSelectedDate.add(Calendar.DATE, 1);
                     mDateTextSetDate(mCalendarSelectedDate);
-                    mCalendarSelectedDate.add(Calendar.DATE, -1);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
         });
     }
@@ -235,8 +192,7 @@ public class AddItemFragment extends Fragment {
      */
     private void mDateTextSetDate(Calendar cal) {
         // offset date by 1 to show correct date in text
-        mDateTextView.setText(formatDate(cal.get(Calendar.DAY_OF_WEEK), cal.get(Calendar.MONTH),
-                cal.get(Calendar.DATE), cal.get(Calendar.YEAR)));
+        mDateTextView.setText(new CustomDate(cal).toString());
     }
 
     /**

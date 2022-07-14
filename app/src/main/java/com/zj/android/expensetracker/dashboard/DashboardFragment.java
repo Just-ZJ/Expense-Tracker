@@ -44,10 +44,12 @@ public class DashboardFragment extends Fragment {
         mViewModel = new ViewModelProvider(requireActivity()).get(CustomViewModel.class);
         DatabaseAccessor databaseAccessor = new DatabaseAccessor(requireContext());
 
+        // populate years in the tab layout at the top
         TabLayout tabLayout = mView.findViewById(R.id.graph_tab_layout);
-        createAndAddTab(tabLayout, "2022");
-//        DatabaseAccessor.getYears();
-
+        List<String> years = DatabaseAccessor.getYears();
+        for (String year : years) {
+            createAndAddTab(tabLayout, year);
+        }
 
         // get height of device
         DisplayMetrics displayMetrics = new DisplayMetrics();

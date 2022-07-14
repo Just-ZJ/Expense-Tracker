@@ -20,8 +20,8 @@ public class ExpenseDataBase extends SQLiteOpenHelper {
     private static ContentValues getContentValues(Expense expense) {
         ContentValues values = new ContentValues();
         values.put(Cols.UUID, expense.getId().toString());
-        // date is stored as long using int type in database
-        values.put(Cols.DATE, expense.getDate().getTime());
+        // date type is stored as String in database - ISO 8601 format
+        values.put(Cols.DATE, expense.getDate().toDatabaseString());
         values.put(Cols.DETAILS, expense.getDetails());
         values.put(Cols.AMOUNT, expense.getAmount());
         return values;
@@ -32,7 +32,7 @@ public class ExpenseDataBase extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("CREATE TABLE " + ExpenseTable.NAME + "(" +
                 " id integer PRIMARY KEY autoincrement, " +
                 Cols.UUID + " text NOT NULL UNIQUE, " +
-                Cols.DATE + " int NOT NULL, " +
+                Cols.DATE + " date NOT NULL, " +
                 Cols.DETAILS + " text, " +
                 Cols.AMOUNT + " NOT NULL" +
                 ")"

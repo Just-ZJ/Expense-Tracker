@@ -1,5 +1,6 @@
 package com.zj.android.expensetracker;
 
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -9,8 +10,27 @@ public class CustomDate extends Date {
     Calendar mCalendar;
 
     public CustomDate(Calendar cal) {
-        super(cal.getTimeInMillis());
         mCalendar = cal;
+    }
+
+    /**
+     * Format of date (ISO 8601): 2022-11-09 22:11:35
+     */
+    public CustomDate(String date) {
+        String[] tmp = date.split(" ");
+        String[] dates = tmp[0].split("-"), time = tmp[1].split(":");
+        mCalendar = Calendar.getInstance();
+        mCalendar.set(Integer.parseInt(dates[0]),
+                Integer.parseInt(dates[1]) - 1,
+                Integer.parseInt(dates[2]),
+                Integer.parseInt(time[0]),
+                Integer.parseInt(time[1]),
+                Integer.parseInt(time[2])
+        );
+    }
+
+    public Calendar getCalendar() {
+        return mCalendar;
     }
 
     /**
@@ -18,8 +38,8 @@ public class CustomDate extends Date {
      *
      * @return day of the week
      */
-    private String getDayString() {
-        switch (mCalendar.get(Calendar.DATE)) {
+    public String getDayString() {
+        switch (mCalendar.get(Calendar.DAY_OF_WEEK)) {
             case Calendar.SUNDAY:
                 return "Sunday";
             case Calendar.MONDAY:
@@ -34,8 +54,9 @@ public class CustomDate extends Date {
                 return "Friday";
             case Calendar.SATURDAY:
                 return "Saturday";
+            default:
+                return null;
         }
-        return null;
     }
 
     /**
@@ -43,7 +64,7 @@ public class CustomDate extends Date {
      *
      * @return month
      */
-    private String getMonthString() {
+    public String getMonthString() {
         switch (mCalendar.get(Calendar.MONTH)) {
             case Calendar.JANUARY:
                 return "January";
@@ -68,45 +89,12 @@ public class CustomDate extends Date {
             case Calendar.NOVEMBER:
                 return "November";
             case Calendar.DECEMBER:
-            default:
                 return "December";
+            default:
+                return null;
         }
     }
 
-    /**
-     * Converts the month in text to a number from 0-11
-     *
-     * @return month in int
-     */
-    private int getMonthInt(String month) {
-        switch (month) {
-            case "January":
-                return 0;
-            case "February":
-                return 1;
-            case "March":
-                return 2;
-            case "April":
-                return 3;
-            case "May":
-                return 4;
-            case "June":
-                return 5;
-            case "July":
-                return 6;
-            case "August":
-                return 7;
-            case "September":
-                return 8;
-            case "October":
-                return 9;
-            case "November":
-                return 10;
-            case "December":
-            default:
-                return 11;
-        }
-    }
 
     /**
      * Returns a string that is in the format of eg. Friday, 5/6/2022
@@ -120,5 +108,18 @@ public class CustomDate extends Date {
                 mCalendar.get(Calendar.MONTH) + 1,
                 mCalendar.get(Calendar.DATE),
                 mCalendar.get(Calendar.YEAR));
+    }
+
+    /**
+     * @return string in ISO 8601 format
+     */
+    public String toDatabaseString() {
+        return String.format(Locale.ENGLISH, "%04d-%02d-%02d %02d:%02d:%02d",
+                mCalendar.get(Calendar.YEAR),
+                mCalendar.get(Calendar.MONTH) + 1,
+                mCalendar.get(Calendar.DATE),
+                mCalendar.get(Calendar.HOUR_OF_DAY),
+                mCalendar.get(Calendar.MINUTE),
+                mCalendar.get(Calendar.SECOND));
     }
 }

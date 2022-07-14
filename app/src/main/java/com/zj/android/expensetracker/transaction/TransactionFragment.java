@@ -17,10 +17,10 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.zj.android.expensetracker.CustomDate;
 import com.zj.android.expensetracker.CustomViewModel;
 import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
-import com.zj.android.expensetracker.add_item.AddItemFragment;
 import com.zj.android.expensetracker.models.Expense;
 
 import java.util.ArrayList;
@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TimeZone;
 
 public class TransactionFragment extends Fragment {
 
@@ -45,17 +44,18 @@ public class TransactionFragment extends Fragment {
         mViewModel = new ViewModelProvider(requireActivity()).get(CustomViewModel.class);
 
         mExpandableListView = mView.findViewById(R.id.transaction_expandableListView);
-        DatabaseAccessor databaseAccessor = new DatabaseAccessor(requireContext());
-        List<Expense> expenses = DatabaseAccessor.getExpenses();
+        // not sure if this line is required
+//        DatabaseAccessor databaseAccessor = new DatabaseAccessor(requireContext());
 
-        mCustomExpandableListAdapter = new CustomExpandableListAdapter(mView.getContext(), expenses);
+        mCustomExpandableListAdapter = new CustomExpandableListAdapter(mView.getContext(), DatabaseAccessor.getExpenses());
         mExpandableListView.setAdapter(mCustomExpandableListAdapter);
 
         mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int i) {
                 // update expenses
-                List<Expense> expenses = DatabaseAccessor.getExpenses();
+                // not sure if this line is required
+//                List<Expense> expenses = DatabaseAccessor.getExpenses();
                 mCustomExpandableListAdapter.updateItems();
             }
         });
@@ -77,81 +77,6 @@ public class TransactionFragment extends Fragment {
     }
 
     /*------------------------------ Helper Methods ------------------------------*/
-    private String getMonthString(Expense expense) {
-        Calendar cal = Calendar.getInstance(TimeZone.getDefault());
-        cal.setTimeInMillis(expense.getDate().getTime());
-        String month;
-        switch (cal.get(Calendar.MONTH)) {
-            case Calendar.JANUARY:
-                month = "January";
-                break;
-            case Calendar.FEBRUARY:
-                month = "February";
-                break;
-            case Calendar.MARCH:
-                month = "March";
-                break;
-            case Calendar.APRIL:
-                month = "April";
-                break;
-            case Calendar.MAY:
-                month = "May";
-                break;
-            case Calendar.JUNE:
-                month = "June";
-                break;
-            case Calendar.JULY:
-                month = "July";
-                break;
-            case Calendar.AUGUST:
-                month = "August";
-                break;
-            case Calendar.SEPTEMBER:
-                month = "September";
-                break;
-            case Calendar.OCTOBER:
-                month = "October";
-                break;
-            case Calendar.NOVEMBER:
-                month = "November";
-                break;
-            case Calendar.DECEMBER:
-            default:
-                month = "December";
-        }
-        return month + " " + cal.get(Calendar.YEAR);
-    }
-
-    private int getMonthInt(String month) {
-        switch (month) {
-            case "January":
-                return 0;
-            case "February":
-                return 1;
-            case "March":
-                return 2;
-            case "April":
-                return 3;
-            case "May":
-                return 4;
-            case "June":
-                return 5;
-            case "July":
-                return 6;
-            case "August":
-                return 7;
-            case "September":
-                return 8;
-            case "October":
-                return 9;
-            case "November":
-                return 10;
-            case "December":
-            default:
-                return 11;
-        }
-    }
-
     public void collapseAll() {
         for (int i = 0; i < mExpandableListView.getExpandableListAdapter().getGroupCount(); i++) {
             mExpandableListView.collapseGroup(i);
@@ -177,6 +102,41 @@ public class TransactionFragment extends Fragment {
                 result = compareMonth(s1[0], s2[0]);
             }
             return result;
+        }
+
+        /**
+         * Converts the month in text to a number from 0-11
+         *
+         * @return month in int
+         */
+        public int getMonthInt(String month) {
+            switch (month) {
+                case "January":
+                    return 0;
+                case "February":
+                    return 1;
+                case "March":
+                    return 2;
+                case "April":
+                    return 3;
+                case "May":
+                    return 4;
+                case "June":
+                    return 5;
+                case "July":
+                    return 6;
+                case "August":
+                    return 7;
+                case "September":
+                    return 8;
+                case "October":
+                    return 9;
+                case "November":
+                    return 10;
+                case "December":
+                default:
+                    return 11;
+            }
         }
 
         private int compareMonth(String m1, String m2) {
@@ -228,7 +188,6 @@ public class TransactionFragment extends Fragment {
 
         @Override
         public int getChildrenCount(int i) {
-            // 	getChildrenCount(int groupPosition)
             List<Expense> tmp = mExpenses.get(getGroup(i));
             if (tmp != null) {
                 return tmp.size();
@@ -300,8 +259,7 @@ public class TransactionFragment extends Fragment {
                 LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 return inflater.inflate(R.layout.fragment_transaction_empty, null);
             }
-            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-            cal.setTime(expense.getDate());
+            Calendar cal = expense.getDate().getCalendar();
             String amount = String.format("$%.2f", expense.getAmount());
             String details = expense.getDetails();
             String categories = DatabaseAccessor.getExpenseCategories(expense);
@@ -311,8 +269,7 @@ public class TransactionFragment extends Fragment {
             }
             TextView transactionDate = view.findViewById(R.id.transaction_item_date);
             try {
-                transactionDate.setText(AddItemFragment.formatDate(cal.get(Calendar.DAY_OF_WEEK), cal.get(Calendar.MONTH),
-                        cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.YEAR)));
+                transactionDate.setText(new CustomDate(cal).toString());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -357,7 +314,7 @@ public class TransactionFragment extends Fragment {
         }
 
         private void removeFromExpenses(Expense expense) {
-            String month = getMonthString(expense);
+            String month = expense.getDate().getMonthString();
             //remove from expenses
             List<Expense> tmp = mExpenses.get(month);
             tmp.remove(expense);
@@ -377,7 +334,8 @@ public class TransactionFragment extends Fragment {
         }
 
         private void addToExpenses(Expense expense) {
-            String month = getMonthString(expense);
+            String month = expense.getDate().getMonthString() +
+                    " " + expense.getDate().getCalendar().get(Calendar.YEAR);
             List<Expense> tmp = mExpenses.get(month);
             // add new key pair
             if (tmp == null) {

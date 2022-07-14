@@ -37,10 +37,10 @@ public class DatabaseAccessor {
         return new DatabaseCursorWrapper(cursor);
     }
 
-//    private static DatabaseCursorWrapper queryExpenseYear(String sql, String[] whereArgs) {
-//        Cursor cursor = mExpenseDataBase.rawQuery(sql, whereArgs);
-//        return new DatabaseCursorWrapper(cursor);
-//    }
+    private static DatabaseCursorWrapper queryExpenseYear(String sql, String[] whereArgs) {
+        Cursor cursor = mExpenseDataBase.rawQuery(sql, whereArgs);
+        return new DatabaseCursorWrapper(cursor);
+    }
 
     private static DatabaseCursorWrapper queryCategory(String whereClause, String[] whereArgs) {
         Cursor cursor = mCategoryDataBase.query(CategoryTable.NAME, null, whereClause,
@@ -60,6 +60,9 @@ public class DatabaseAccessor {
         mExpenseDataBase.delete(ExpenseTable.NAME, whereClause, whereArgs);
     }
 
+    /**
+     * @return List<Expense> of all expenses in the database
+     */
     public static List<Expense> getExpenses() {
         List<Expense> expenses = new ArrayList<>();
         DatabaseCursorWrapper cursor = queryExpense(null, null);
@@ -75,35 +78,37 @@ public class DatabaseAccessor {
         return expenses;
     }
 
-//    public static List<String> getYears(){
-//        List<String> years = new ArrayList<>();
-//        String sql = "SELECT * FROM ( SELECT distinct " + ExpenseTable.Cols.DATE + " FROM " + ExpenseTable.NAME + ") ";
-//        String[] whereArgs = new String[]{};
-//        DatabaseCursorWrapper cursor = queryExpenseYear(sql, whereArgs);
-//
-//        try {
-//            cursor.moveToFirst();
-//            int i = 0;
-//            while (!cursor.isAfterLast()) {
-//                String date = cursor.getString(cursor.getColumnIndex(ExpenseTable.Cols.DATE));
-//                String year = date.substring(date.length() - 4);
-//                Log.i("tryout1", "getYears: " + year);
-//                cursor.moveToNext();
-//            }
-//        } finally {
-//            cursor.close();
-//        }
-//        return years;
-//    }
+    /**
+     * @return List<String> of unique years in from all of the expenses in the database
+     */
+    public static List<String> getYears() {
+        List<String> years = new ArrayList<>();
+        String sql = "SELECT DISTINCT strftime('%Y', " + ExpenseTable.Cols.DATE + ") as Year"
+                + " FROM " + ExpenseTable.NAME
+                + " ORDER BY Year ASC;";
+        String[] whereArgs = new String[]{};
+        DatabaseCursorWrapper cursor = queryExpenseYear(sql, whereArgs);
+
+        try {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                years.add(cursor.getExpenseYear());
+                cursor.moveToNext();
+            }
+        } finally {
+            cursor.close();
+        }
+        return years;
+    }
 
     public static Category getCategoryByUUID(String uuid) {
-        DatabaseCursorWrapper cursor = queryCategory(CategoryTable.Cols.UUID + " =? ", new String[]{uuid});
+        DatabaseCursorWrapper cursor = queryCategory(CategoryTable.Cols.UUID + " = ? ", new String[]{uuid});
         cursor.moveToFirst();
         return cursor.getCategory();
     }
 
     public static Category getCategoryByName(String name) {
-        DatabaseCursorWrapper cursor = queryCategory(CategoryTable.Cols.NAME + " =? ", new String[]{name});
+        DatabaseCursorWrapper cursor = queryCategory(CategoryTable.Cols.NAME + " = ? ", new String[]{name});
         cursor.moveToFirst();
         return cursor.getCategory();
     }
@@ -120,8 +125,7 @@ public class DatabaseAccessor {
             int i = 0;
             while (!cursor.isAfterLast()) {
                 Category tmp = cursor.getCategory();
-                categories[i] = tmp.getName();
-                i++;
+                categories[i++] = tmp.getName();
                 cursor.moveToNext();
             }
         } finally {
