@@ -76,7 +76,7 @@ public class DatabaseAccessor {
 
         try {
             cursor.moveToFirst();
-            return cursor.getInt("TotalAmount");
+            return (float) cursor.getDouble("TotalAmount");
         } finally {
             cursor.close();
         }

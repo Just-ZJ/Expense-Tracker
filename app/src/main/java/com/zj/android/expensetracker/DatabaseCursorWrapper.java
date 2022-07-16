@@ -22,6 +22,11 @@ public class DatabaseCursorWrapper extends CursorWrapper {
         return getInt(getColumnIndex(columnName));
     }
 
+    public double getDouble(String columnName) {
+        return getDouble(getColumnIndex(columnName));
+    }
+
+
     public String getString(String columnName) {
         return getString(getColumnIndex(columnName));
     }
