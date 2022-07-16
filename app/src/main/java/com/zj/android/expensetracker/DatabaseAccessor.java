@@ -31,9 +31,8 @@ public class DatabaseAccessor {
         mExpenseToCategoryDataBase = new ExpenseToCategoryDataBase(mContext).getReadableDatabase();
     }
 
-    private static DatabaseCursorWrapper queryExpense(String whereClause, String[] whereArgs) {
-        Cursor cursor = mExpenseDataBase.query(ExpenseTable.NAME, null, whereClause,
-                whereArgs, null, null, null);
+    private static DatabaseCursorWrapper queryExpense(String sql, String[] whereArgs) {
+        Cursor cursor = mExpenseDataBase.rawQuery(sql, whereArgs);
         return new DatabaseCursorWrapper(cursor);
     }
 
@@ -61,11 +60,35 @@ public class DatabaseAccessor {
     }
 
     /**
+     * Get the total amount for all expenses in a particular month or year
+     * <p>
+     * Example SQL Query:
+     * SELECT SUM(amount) FROM expenses where strftime('%Y-%m',date) ='2021-07'
+     *
+     * @param period in the form of "YYYY-MM" or "YYYY"
+     * @return the total amount of @period
+     */
+    public static float getExpenseAmount(String period) {
+        String sql = "SELECT SUM(" + ExpenseTable.Cols.AMOUNT + ") as TotalAmount"
+                + " FROM " + ExpenseTable.NAME
+                + " WHERE strftime('%Y-%m', " + ExpenseTable.Cols.DATE + ") = '" + period + "'";
+        DatabaseCursorWrapper cursor = queryExpense(sql, null);
+
+        try {
+            cursor.moveToFirst();
+            return cursor.getTotalAmount();
+        } finally {
+            cursor.close();
+        }
+    }
+
+    /**
      * @return List<Expense> of all expenses in the database
      */
     public static List<Expense> getExpenses() {
         List<Expense> expenses = new ArrayList<>();
-        DatabaseCursorWrapper cursor = queryExpense(null, null);
+        String sql = "SELECT * FROM " + ExpenseTable.NAME;
+        DatabaseCursorWrapper cursor = queryExpense(sql, null);
         try {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
@@ -92,7 +115,7 @@ public class DatabaseAccessor {
         try {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
-                years.add(cursor.getExpenseYear());
+                years.add(cursor.getYear());
                 cursor.moveToNext();
             }
         } finally {

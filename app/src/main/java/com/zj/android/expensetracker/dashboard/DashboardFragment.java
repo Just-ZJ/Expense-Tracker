@@ -35,6 +35,7 @@ public class DashboardFragment extends Fragment {
 
     private View mView;
     private CustomViewModel mViewModel;
+    private String mSelectedYear;
 
     @Nullable
     @Override
@@ -50,6 +51,7 @@ public class DashboardFragment extends Fragment {
         for (String year : years) {
             createAndAddTab(tabLayout, year);
         }
+        mSelectedYear = "2022";
 
         // get height of device
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -95,6 +97,26 @@ public class DashboardFragment extends Fragment {
         // legend on bottom of graph
         pieChart.getLegend().setEnabled(false);
         pieChart.invalidate(); // refresh chart
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                mSelectedYear = tab.getText().toString();
+                barChart.setData(barData);
+                barChart.invalidate(); // refresh chart
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
         return mView;
     }
 
@@ -109,18 +131,18 @@ public class DashboardFragment extends Fragment {
     private List<BarEntry> setupBarData() {
         List<BarEntry> entries = new ArrayList<>();
         // NOTE: Order of the entries added determines their position.
-        entries.add(new BarEntry(0, 4.01f));
-        entries.add(new BarEntry(1, -2.32f));
-        entries.add(new BarEntry(2, 2.33f));
-        entries.add(new BarEntry(3, -2.35f));
-        entries.add(new BarEntry(4, 4.01f));
-        entries.add(new BarEntry(5, -2.32f));
-        entries.add(new BarEntry(6, 4.01f));
-        entries.add(new BarEntry(7, -2.32f));
-        entries.add(new BarEntry(8, 2.33f));
-        entries.add(new BarEntry(9, -2.35f));
-        entries.add(new BarEntry(10, 4.01f));
-        entries.add(new BarEntry(11, -2.32f));
+        entries.add(new BarEntry(0, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-01")));
+        entries.add(new BarEntry(1, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-02")));
+        entries.add(new BarEntry(2, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-03")));
+        entries.add(new BarEntry(3, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-04")));
+        entries.add(new BarEntry(4, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-05")));
+        entries.add(new BarEntry(5, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-06")));
+        entries.add(new BarEntry(6, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-07")));
+        entries.add(new BarEntry(7, DatabaseAccessor.getExpenseAmount("2022" + "-08")));
+        entries.add(new BarEntry(8, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-09")));
+        entries.add(new BarEntry(9, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-10")));
+        entries.add(new BarEntry(10, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-11")));
+        entries.add(new BarEntry(11, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-12")));
         return entries;
     }
 

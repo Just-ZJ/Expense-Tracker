@@ -43,10 +43,13 @@ public class DatabaseCursorWrapper extends CursorWrapper {
         return expense;
     }
 
-    public String getExpenseYear() {
+    public int getTotalAmount() {
+        return getInt(getColumnIndex("TotalAmount"));
+    }
+
+    public String getYear() {
         // refer to sql query in getYears() of DatabaseAccessor
-        String date = getString(getColumnIndex("Year"));
-        return date;
+        return getString(getColumnIndex("Year"));
     }
 
     public ExpenseToCategory getExpenseToCategory() {
