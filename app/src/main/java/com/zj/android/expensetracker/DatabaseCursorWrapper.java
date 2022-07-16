@@ -18,6 +18,14 @@ public class DatabaseCursorWrapper extends CursorWrapper {
         super(cursor);
     }
 
+    public int getInt(String columnName) {
+        return getInt(getColumnIndex(columnName));
+    }
+
+    public String getString(String columnName) {
+        return getString(getColumnIndex(columnName));
+    }
+
     /*************************** getting tuples from database **********************/
     public Category getCategory() {
         String uuidString = getString(getColumnIndex(CategoryTable.Cols.UUID));
@@ -41,15 +49,6 @@ public class DatabaseCursorWrapper extends CursorWrapper {
         expense.setAmount(Double.parseDouble(amount));
 
         return expense;
-    }
-
-    public int getTotalAmount() {
-        return getInt(getColumnIndex("TotalAmount"));
-    }
-
-    public String getYear() {
-        // refer to sql query in getYears() of DatabaseAccessor
-        return getString(getColumnIndex("Year"));
     }
 
     public ExpenseToCategory getExpenseToCategory() {

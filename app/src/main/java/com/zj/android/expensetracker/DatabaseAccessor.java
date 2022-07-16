@@ -76,7 +76,7 @@ public class DatabaseAccessor {
 
         try {
             cursor.moveToFirst();
-            return cursor.getTotalAmount();
+            return cursor.getInt("TotalAmount");
         } finally {
             cursor.close();
         }
@@ -85,9 +85,9 @@ public class DatabaseAccessor {
     /**
      * @return List<Expense> of all expenses in the database
      */
-    public static List<Expense> getExpenses() {
+    public static List<Expense> getExpenses(String whereClause) {
         List<Expense> expenses = new ArrayList<>();
-        String sql = "SELECT * FROM " + ExpenseTable.NAME;
+        String sql = "SELECT * FROM " + ExpenseTable.NAME + whereClause;
         DatabaseCursorWrapper cursor = queryExpense(sql, null);
         try {
             cursor.moveToFirst();
@@ -102,7 +102,7 @@ public class DatabaseAccessor {
     }
 
     /**
-     * @return List<String> of unique years in from all of the expenses in the database
+     * @return List<String> of unique years from all of the expenses in the database
      */
     public static List<String> getYears() {
         List<String> years = new ArrayList<>();
@@ -115,7 +115,7 @@ public class DatabaseAccessor {
         try {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
-                years.add(cursor.getYear());
+                years.add(cursor.getString("Year"));
                 cursor.moveToNext();
             }
         } finally {
@@ -123,6 +123,44 @@ public class DatabaseAccessor {
         }
         return years;
     }
+
+    /**
+     * @return List<String> of unique month & years from all of the expenses in the database
+     */
+    public static List<String> getUniqueMonthYear() {
+        List<String> monthYear = new ArrayList<>();
+        String sql = "SELECT DISTINCT strftime('%Y-%m', " + ExpenseTable.Cols.DATE + ") as MonthYear" +
+                " FROM " + ExpenseTable.NAME +
+                " ORDER BY MonthYear DESC";
+        DatabaseCursorWrapper cursor = queryExpense(sql, null);
+        try {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                monthYear.add(cursor.getString("MonthYear"));
+                cursor.moveToNext();
+            }
+        } finally {
+            cursor.close();
+        }
+        return monthYear;
+    }
+
+    /**
+     * SELECT COUNT(DATE) FROM expenses WHERE strftime('%Y-%m',date) = '2022-07'
+     */
+    public static int getMonthYearCount(String period) {
+        String sql = "SELECT COUNT(" + ExpenseTable.Cols.DATE + ") as MonthYearCount" +
+                " FROM " + ExpenseTable.NAME +
+                " WHERE strftime('%Y-%m', " + ExpenseTable.Cols.DATE + " ) = '" + period + "'";
+        DatabaseCursorWrapper cursor = queryExpense(sql, null);
+        try {
+            cursor.moveToFirst();
+            return cursor.getInt("MonthYearCount");
+        } finally {
+            cursor.close();
+        }
+    }
+
 
     public static Category getCategoryByUUID(String uuid) {
         DatabaseCursorWrapper cursor = queryCategory(CategoryTable.Cols.UUID + " = ? ", new String[]{uuid});

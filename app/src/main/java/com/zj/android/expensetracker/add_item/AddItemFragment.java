@@ -14,7 +14,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.chip.Chip;
@@ -26,7 +25,6 @@ import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClic
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.zj.android.expensetracker.CustomDate;
-import com.zj.android.expensetracker.CustomViewModel;
 import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
 import com.zj.android.expensetracker.database.CategoryDataBase;
@@ -56,13 +54,13 @@ public class AddItemFragment extends Fragment {
     private CategoryDataBase mCategoryDataBase;
     private ExpenseToCategoryDataBase mExpenseToCategoryDataBase;
     private View mView;
-    private CustomViewModel mViewModel;
+    //    private CustomViewModel mViewModel;
     private Calendar mCalendarSelectedDate;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mViewModel = new ViewModelProvider(requireActivity()).get(CustomViewModel.class);
+//        mViewModel = new ViewModelProvider(requireActivity()).get(CustomViewModel.class);
 
         DatabaseAccessor databaseAccessor = new DatabaseAccessor(requireContext());
         mExpenseDataBase = new ExpenseDataBase(this.getContext());
@@ -138,7 +136,7 @@ public class AddItemFragment extends Fragment {
                 mExpenseToCategoryDataBase.addCategory(expenseToCategory);
             }
             // store expense to view model
-            mViewModel.setNewExpense(expense);
+//            mViewModel.setNewExpense(expense);
 
             // clear form
             clearFields();
