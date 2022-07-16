@@ -91,7 +91,6 @@ public class TransactionFragment extends Fragment {
 
         @Override
         public int getChildrenCount(int i) {
-//            SELECT COUNT(DATE) FROM expenses WHERE strftime('%Y-%m',date) = '2022-07'
             return DatabaseAccessor.getMonthYearCount(getGroup(i));
 //            List<Expense> tmp = mExpenses.get(getGroup(i));
 //            if (tmp != null) {
@@ -154,7 +153,7 @@ public class TransactionFragment extends Fragment {
                 view = inflater.inflate(R.layout.fragment_transaction_expandable_groups, null);
             }
             TextView groupMonth = view.findViewById(R.id.transaction_group_month);
-            groupMonth.setText(month);
+            groupMonth.setText(convertGroupViewText(month));
             TextView groupTotalAmt = view.findViewById(R.id.transaction_group_amount);
             groupTotalAmt.setText(totalAmount);
             return view;
@@ -218,6 +217,56 @@ public class TransactionFragment extends Fragment {
         public void updateItems() {
             this.mMonths = DatabaseAccessor.getUniqueMonthYear();
             notifyDataSetChanged();
+        }
+
+        /**
+         * Converts @period from '2022-07'  to 'July 2022'
+         *
+         * @param period a string in the form of '2022-07'
+         * @return returns a string in the form of 'July 2022'
+         */
+        public String convertGroupViewText(String period) {
+            String[] tmp = period.split("-");
+            String result;
+            switch (tmp[1]) {
+                case "01":
+                    result = "January";
+                    break;
+                case "02":
+                    result = "February";
+                    break;
+                case "03":
+                    result = "March";
+                    break;
+                case "04":
+                    result = "April";
+                    break;
+                case "05":
+                    result = "May";
+                    break;
+                case "06":
+                    result = "June";
+                    break;
+                case "07":
+                    result = "July";
+                    break;
+                case "08":
+                    result = "August";
+                    break;
+                case "09":
+                    result = "September";
+                    break;
+                case "10":
+                    result = "October";
+                    break;
+                case "11":
+                    result = "November";
+                    break;
+                default:
+                    result = "December";
+                    break;
+            }
+            return result + " " + tmp[0];
         }
     }
 

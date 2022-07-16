@@ -61,7 +61,7 @@ public class DatabaseAccessor {
 
     /**
      * Get the total amount for all expenses in a particular month or year
-     * <p>
+     *
      * Example SQL Query:
      * SELECT SUM(amount) FROM expenses where strftime('%Y-%m',date) ='2021-07'
      *
@@ -125,6 +125,8 @@ public class DatabaseAccessor {
     }
 
     /**
+     * Gets all unique months & year of all expenses in the database
+     *
      * @return List<String> of unique month & years from all of the expenses in the database
      */
     public static List<String> getUniqueMonthYear() {
@@ -146,7 +148,13 @@ public class DatabaseAccessor {
     }
 
     /**
+     * Gets the # of expenses in a particular @period
+     * <p>
+     * Example of SQL Query:
      * SELECT COUNT(DATE) FROM expenses WHERE strftime('%Y-%m',date) = '2022-07'
+     *
+     * @param period a string in the form of '2022-07'
+     * @return # of expense in @period
      */
     public static int getMonthYearCount(String period) {
         String sql = "SELECT COUNT(" + ExpenseTable.Cols.DATE + ") as MonthYearCount" +
