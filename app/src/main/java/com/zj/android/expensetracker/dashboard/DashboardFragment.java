@@ -26,6 +26,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.zj.android.expensetracker.CustomViewModel;
 import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
+import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,26 +57,15 @@ public class DashboardFragment extends Fragment {
         }
         mSelectedYear = years.get(0);
 
-        // get height of device
+        // get dimensions of device
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int device_height_px = displayMetrics.heightPixels;
-        int device_width_px = displayMetrics.widthPixels;
+        int device_height_px = displayMetrics.heightPixels,
+                device_width_px = displayMetrics.widthPixels;
 
-        // setup bar chart data
-        BarData barData = setupBarData();
+        // setup bar chart
         mBarChart = mView.findViewById(R.id.bar_chart);
-        mBarChart.setMinimumHeight(device_height_px / 4 * 3);
-        mBarChart.setMinimumWidth(device_width_px);
-
-        mBarChart.setData(barData);
-        // how many bars are allowed to be seen at once
-        mBarChart.setVisibleXRangeMaximum(5);
-        float offset = device_width_px / 100f;
-        mBarChart.setExtraOffsets(offset * 1, 0, offset * 5, 0);
-
-        setBarChartAttributes(mBarChart);
-        mBarChart.invalidate(); // refresh chart
+        setupBarChart(device_height_px, device_width_px);
 
         // setup pie chart data
         List<PieEntry> pieEntries = setupPieData();
@@ -124,6 +114,21 @@ public class DashboardFragment extends Fragment {
     }
 
     /*------------------------------ Bar Chart Helper Methods ------------------------------*/
+    private void setupBarChart(int device_height_px, int device_width_px) {
+        BarData barData = setupBarData();
+        mBarChart.setMinimumHeight(device_height_px / 4 * 3);
+        mBarChart.setMinimumWidth(device_width_px);
+
+        mBarChart.setData(barData);
+        // how many bars are allowed to be seen at once
+        mBarChart.setVisibleXRangeMaximum(5);
+        float offset = device_width_px / 100f;
+        mBarChart.setExtraOffsets(offset * 1, 0, offset * 5, 0);
+
+        setBarChartAttributes(mBarChart);
+        mBarChart.invalidate(); // refresh chart
+    }
+
     private BarData setupBarData() {
         List<BarEntry> barEntries = new ArrayList<>();
         // NOTE: Order of the entries added determines their position.
@@ -202,6 +207,9 @@ public class DashboardFragment extends Fragment {
     /*------------------------------ Pie Chart Helper Methods ------------------------------*/
     private List<PieEntry> setupPieData() {
         List<PieEntry> entries = new ArrayList<>();
+        String whereClause = " WHERE strftime('%Y-%m', " + ExpenseTable.Cols.DATE + ") = ''";
+
+        DatabaseAccessor.getExpenses(whereClause);
         // NOTE: Order of the entries added determines their position.
         entries.add(new PieEntry(18.5f, "Green"));
         entries.add(new PieEntry(26.7f, "Yellow"));
@@ -210,7 +218,7 @@ public class DashboardFragment extends Fragment {
         return entries;
     }
 
-    static class CustomValueFormatter extends ValueFormatter {
+    private static class CustomValueFormatter extends ValueFormatter {
 
         @Override
         public String getBarLabel(BarEntry barEntry) {
