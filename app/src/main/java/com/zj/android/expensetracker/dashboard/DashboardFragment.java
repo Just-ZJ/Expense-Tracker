@@ -55,7 +55,7 @@ public class DashboardFragment extends Fragment {
         for (String year : years) {
             createAndAddTab(tabLayout, year);
         }
-        mSelectedYear = years.get(0);
+        if (years.size() > 0) mSelectedYear = years.get(0);
 
         // get dimensions of device
         DisplayMetrics displayMetrics = new DisplayMetrics();

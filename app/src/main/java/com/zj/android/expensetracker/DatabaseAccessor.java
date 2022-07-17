@@ -4,12 +4,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.zj.android.expensetracker.database.CategoryDataBase;
 import com.zj.android.expensetracker.database.ExpenseDataBase;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.CategoryTable;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseTable;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseToCategoryTable;
-import com.zj.android.expensetracker.database.ExpenseToCategoryDataBase;
 import com.zj.android.expensetracker.models.Category;
 import com.zj.android.expensetracker.models.Expense;
 import com.zj.android.expensetracker.models.ExpenseToCategory;
@@ -19,16 +17,12 @@ import java.util.List;
 
 public class DatabaseAccessor {
 
-    private static SQLiteDatabase mCategoryDataBase;
     private static SQLiteDatabase mExpenseDataBase;
-    private static SQLiteDatabase mExpenseToCategoryDataBase;
     private final Context mContext;
 
     public DatabaseAccessor(Context context) {
         mContext = context.getApplicationContext();
-        mCategoryDataBase = new CategoryDataBase(mContext).getReadableDatabase();
         mExpenseDataBase = new ExpenseDataBase(mContext).getReadableDatabase();
-        mExpenseToCategoryDataBase = new ExpenseToCategoryDataBase(mContext).getReadableDatabase();
     }
 
     private static DatabaseCursorWrapper queryExpense(String sql, String[] whereArgs) {
@@ -37,13 +31,13 @@ public class DatabaseAccessor {
     }
 
     private static DatabaseCursorWrapper queryCategory(String whereClause, String[] whereArgs) {
-        Cursor cursor = mCategoryDataBase.query(CategoryTable.NAME, null, whereClause,
+        Cursor cursor = mExpenseDataBase.query(CategoryTable.NAME, null, whereClause,
                 whereArgs, null, null, null);
         return new DatabaseCursorWrapper(cursor);
     }
 
     private static DatabaseCursorWrapper queryExpenseToCategory(String whereClause, String[] whereArgs) {
-        Cursor cursor = mExpenseToCategoryDataBase.query(ExpenseToCategoryTable.NAME, null, whereClause,
+        Cursor cursor = mExpenseDataBase.query(ExpenseToCategoryTable.NAME, null, whereClause,
                 whereArgs, null, null, null);
         return new DatabaseCursorWrapper(cursor);
     }
@@ -201,7 +195,7 @@ public class DatabaseAccessor {
     public static void removeCategory(String name) {
         String whereClause = CategoryTable.Cols.NAME + " = ?";
         String[] whereArgs = new String[]{name};
-        mCategoryDataBase.delete(CategoryTable.NAME, whereClause, whereArgs);
+        mExpenseDataBase.delete(CategoryTable.NAME, whereClause, whereArgs);
     }
 
     public static String getExpenseCategories(Expense expense) {

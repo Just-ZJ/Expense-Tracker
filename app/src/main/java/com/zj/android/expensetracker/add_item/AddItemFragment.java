@@ -27,9 +27,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.zj.android.expensetracker.CustomDate;
 import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
-import com.zj.android.expensetracker.database.CategoryDataBase;
 import com.zj.android.expensetracker.database.ExpenseDataBase;
-import com.zj.android.expensetracker.database.ExpenseToCategoryDataBase;
 import com.zj.android.expensetracker.models.Category;
 import com.zj.android.expensetracker.models.Expense;
 import com.zj.android.expensetracker.models.ExpenseToCategory;
@@ -51,8 +49,7 @@ public class AddItemFragment extends Fragment {
     private EditText mAmountEditText;
     private Button mAddExpenseButton;
     private ExpenseDataBase mExpenseDataBase;
-    private CategoryDataBase mCategoryDataBase;
-    private ExpenseToCategoryDataBase mExpenseToCategoryDataBase;
+
     private View mView;
     //    private CustomViewModel mViewModel;
     private Calendar mCalendarSelectedDate;
@@ -64,8 +61,6 @@ public class AddItemFragment extends Fragment {
 
         DatabaseAccessor databaseAccessor = new DatabaseAccessor(requireContext());
         mExpenseDataBase = new ExpenseDataBase(this.getContext());
-        mCategoryDataBase = new CategoryDataBase(this.getContext());
-        mExpenseToCategoryDataBase = new ExpenseToCategoryDataBase(this.getContext());
 
         mView = inflater.inflate(R.layout.activity_add_item, container, false);
         mDateTextView = mView.findViewById(R.id.textView_date);
@@ -133,7 +128,7 @@ public class AddItemFragment extends Fragment {
                 Category category = DatabaseAccessor.getCategoryByName(s);
                 ExpenseToCategory expenseToCategory = new ExpenseToCategory(
                         UUID.fromString(expense.getId().toString()), UUID.fromString(category.getId().toString()));
-                mExpenseToCategoryDataBase.addCategory(expenseToCategory);
+                mExpenseDataBase.addCategory(expenseToCategory);
             }
             // store expense to view model
 //            mViewModel.setNewExpense(expense);
@@ -239,7 +234,7 @@ public class AddItemFragment extends Fragment {
      */
     private void addDefaultCategories() {
         for (String s : DEFAULT_CATEGORIES) {
-            mCategoryDataBase.addCategory(new Category(s));
+            mExpenseDataBase.addCategory(new Category(s));
         }
     }
 
@@ -301,7 +296,7 @@ public class AddItemFragment extends Fragment {
                     mCategoriesChipGroup.addView(addChip(inputText, false),
                             mCategoriesChipGroup.getChildCount() - 1);
                     // add to database
-                    mCategoryDataBase.addCategory(new Category(inputText));
+                    mExpenseDataBase.addCategory(new Category(inputText));
                 })
                 .show();
     }
