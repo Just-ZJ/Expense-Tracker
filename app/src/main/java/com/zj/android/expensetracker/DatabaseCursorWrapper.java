@@ -3,9 +3,9 @@ package com.zj.android.expensetracker;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 
-import com.zj.android.expensetracker.database.CategoryDbSchema.CategoryTable;
+import com.zj.android.expensetracker.database.ExpenseDbSchema.CategoryTable;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseTable;
-import com.zj.android.expensetracker.database.ExpenseToCategoryDbSchema.ExpenseToCategoryTable;
+import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseToCategoryTable;
 import com.zj.android.expensetracker.models.Category;
 import com.zj.android.expensetracker.models.Expense;
 import com.zj.android.expensetracker.models.ExpenseToCategory;

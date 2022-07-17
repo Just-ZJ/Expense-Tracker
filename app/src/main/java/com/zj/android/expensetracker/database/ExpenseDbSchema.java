@@ -11,4 +11,26 @@ public class ExpenseDbSchema {
             public static final String AMOUNT = "amount";
         }
     }
+
+    public static final class CategoryTable {
+        public static final String NAME = "categories";
+
+        // all unique categories of expenses
+        public static final class Cols {
+            public static final String UUID = "uuid";
+            public static final String NAME = "name";
+        }
+    }
+
+    public static final class ExpenseToCategoryTable {
+        public static final String NAME = "expenseToCategories";
+
+        // all unique categories of expenses
+        public static final class Cols {
+            public static final String UUID = "uuid";
+            public static final String EXPENSE_UUID = "expense_uuid";
+            public static final String CATEGORY_UUID = "category_uuid";
+        }
+    }
+
 }

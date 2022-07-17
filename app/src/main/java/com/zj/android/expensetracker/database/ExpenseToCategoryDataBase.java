@@ -5,10 +5,10 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.zj.android.expensetracker.database.CategoryDbSchema.CategoryTable;
+import com.zj.android.expensetracker.database.ExpenseDbSchema.CategoryTable;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseTable;
-import com.zj.android.expensetracker.database.ExpenseToCategoryDbSchema.ExpenseToCategoryTable;
-import com.zj.android.expensetracker.database.ExpenseToCategoryDbSchema.ExpenseToCategoryTable.Cols;
+import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseToCategoryTable;
+import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseToCategoryTable.Cols;
 import com.zj.android.expensetracker.models.ExpenseToCategory;
 
 
