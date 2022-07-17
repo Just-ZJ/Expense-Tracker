@@ -17,35 +17,23 @@ import java.util.List;
 
 public class DatabaseAccessor {
 
-    private static SQLiteDatabase mExpenseDataBase;
+    private static SQLiteDatabase mDataBase;
     private final Context mContext;
 
     public DatabaseAccessor(Context context) {
         mContext = context.getApplicationContext();
-        mExpenseDataBase = new ExpenseDataBase(mContext).getReadableDatabase();
+        mDataBase = new ExpenseDataBase(mContext).getReadableDatabase();
     }
 
-    private static DatabaseCursorWrapper queryExpense(String sql, String[] whereArgs) {
-        Cursor cursor = mExpenseDataBase.rawQuery(sql, whereArgs);
-        return new DatabaseCursorWrapper(cursor);
-    }
-
-    private static DatabaseCursorWrapper queryCategory(String whereClause, String[] whereArgs) {
-        Cursor cursor = mExpenseDataBase.query(CategoryTable.NAME, null, whereClause,
-                whereArgs, null, null, null);
-        return new DatabaseCursorWrapper(cursor);
-    }
-
-    private static DatabaseCursorWrapper queryExpenseToCategory(String whereClause, String[] whereArgs) {
-        Cursor cursor = mExpenseDataBase.query(ExpenseToCategoryTable.NAME, null, whereClause,
-                whereArgs, null, null, null);
+    private static DatabaseCursorWrapper query(String sql, String[] whereArgs) {
+        Cursor cursor = mDataBase.rawQuery(sql, whereArgs);
         return new DatabaseCursorWrapper(cursor);
     }
 
     public static void removeExpense(Expense expense) {
         String whereClause = ExpenseTable.Cols.UUID + " = ?";
         String[] whereArgs = new String[]{expense.getId().toString()};
-        mExpenseDataBase.delete(ExpenseTable.NAME, whereClause, whereArgs);
+        mDataBase.delete(ExpenseTable.NAME, whereClause, whereArgs);
     }
 
     /**
@@ -60,8 +48,9 @@ public class DatabaseAccessor {
     public static float getExpenseAmount(String period) {
         String sql = "SELECT SUM(" + ExpenseTable.Cols.AMOUNT + ") as TotalAmount"
                 + " FROM " + ExpenseTable.NAME
-                + " WHERE strftime('%Y-%m', " + ExpenseTable.Cols.DATE + ") = '" + period + "'";
-        DatabaseCursorWrapper cursor = queryExpense(sql, null);
+                + " WHERE strftime('%Y-%m', " + ExpenseTable.Cols.DATE + ") = ?";
+        String[] whereArgs = new String[]{period};
+        DatabaseCursorWrapper cursor = query(sql, whereArgs);
 
         try {
             cursor.moveToFirst();
@@ -77,7 +66,7 @@ public class DatabaseAccessor {
     public static List<Expense> getExpenses(String whereClause) {
         List<Expense> expenses = new ArrayList<>();
         String sql = "SELECT * FROM " + ExpenseTable.NAME + whereClause;
-        DatabaseCursorWrapper cursor = queryExpense(sql, null);
+        DatabaseCursorWrapper cursor = query(sql, null);
         try {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
@@ -97,9 +86,8 @@ public class DatabaseAccessor {
         List<String> years = new ArrayList<>();
         String sql = "SELECT DISTINCT strftime('%Y', " + ExpenseTable.Cols.DATE + ") as Year"
                 + " FROM " + ExpenseTable.NAME
-                + " ORDER BY Year ASC;";
-        String[] whereArgs = new String[]{};
-        DatabaseCursorWrapper cursor = queryExpense(sql, whereArgs);
+                + " ORDER BY Year ASC";
+        DatabaseCursorWrapper cursor = query(sql, null);
 
         try {
             cursor.moveToFirst();
@@ -123,7 +111,7 @@ public class DatabaseAccessor {
         String sql = "SELECT DISTINCT strftime('%Y-%m', " + ExpenseTable.Cols.DATE + ") as MonthYear" +
                 " FROM " + ExpenseTable.NAME +
                 " ORDER BY MonthYear DESC";
-        DatabaseCursorWrapper cursor = queryExpense(sql, null);
+        DatabaseCursorWrapper cursor = query(sql, null);
         try {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
@@ -148,8 +136,9 @@ public class DatabaseAccessor {
     public static int getMonthYearCount(String period) {
         String sql = "SELECT COUNT(" + ExpenseTable.Cols.DATE + ") as MonthYearCount" +
                 " FROM " + ExpenseTable.NAME +
-                " WHERE strftime('%Y-%m', " + ExpenseTable.Cols.DATE + " ) = '" + period + "'";
-        DatabaseCursorWrapper cursor = queryExpense(sql, null);
+                " WHERE strftime('%Y-%m', " + ExpenseTable.Cols.DATE + ") = ?";
+        String[] whereArgs = new String[]{period};
+        DatabaseCursorWrapper cursor = query(sql, whereArgs);
         try {
             cursor.moveToFirst();
             return cursor.getInt("MonthYearCount");
@@ -160,24 +149,32 @@ public class DatabaseAccessor {
 
 
     public static Category getCategoryByUUID(String uuid) {
-        DatabaseCursorWrapper cursor = queryCategory(CategoryTable.Cols.UUID + " = ? ", new String[]{uuid});
+        String sql = "SELECT * FROM " + CategoryTable.NAME +
+                " WHERE " + CategoryTable.Cols.UUID + " = ?";
+        String[] whereArgs = new String[]{uuid};
+        DatabaseCursorWrapper cursor = query(sql, whereArgs);
         cursor.moveToFirst();
         return cursor.getCategory();
     }
 
     public static Category getCategoryByName(String name) {
-        DatabaseCursorWrapper cursor = queryCategory(CategoryTable.Cols.NAME + " = ? ", new String[]{name});
+        String sql = "SELECT * FROM " + CategoryTable.NAME +
+                " WHERE " + CategoryTable.Cols.NAME + " = ?";
+        String[] whereArgs = new String[]{name};
+        DatabaseCursorWrapper cursor = query(sql, whereArgs);
         cursor.moveToFirst();
         return cursor.getCategory();
     }
 
     public static int getCategoriesCount() {
-        return queryCategory(null, null).getCount();
+        String sql = "SELECT * FROM " + CategoryTable.NAME;
+        return query(sql, null).getCount();
     }
 
     public static String[] getCategories() {
         String[] categories = new String[getCategoriesCount()];
-        DatabaseCursorWrapper cursor = queryCategory(null, null);
+        String sql = "SELECT * FROM " + CategoryTable.NAME;
+        DatabaseCursorWrapper cursor = query(sql, null);
         try {
             cursor.moveToFirst();
             int i = 0;
@@ -195,14 +192,14 @@ public class DatabaseAccessor {
     public static void removeCategory(String name) {
         String whereClause = CategoryTable.Cols.NAME + " = ?";
         String[] whereArgs = new String[]{name};
-        mExpenseDataBase.delete(CategoryTable.NAME, whereClause, whereArgs);
+        mDataBase.delete(CategoryTable.NAME, whereClause, whereArgs);
     }
 
     public static String getExpenseCategories(Expense expense) {
         String categories = "";
-        String whereClause = ExpenseToCategoryTable.Cols.EXPENSE_UUID + " = ?";
+        String sql = "SELECT * FROM " + ExpenseToCategoryTable.NAME + " WHERE " + ExpenseToCategoryTable.Cols.EXPENSE_UUID + " = ?";
         String[] whereArgs = new String[]{expense.getId().toString()};
-        DatabaseCursorWrapper cursor = queryExpenseToCategory(whereClause, whereArgs);
+        DatabaseCursorWrapper cursor = query(sql, whereArgs);
         try {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
