@@ -33,9 +33,12 @@ import java.util.List;
 
 public class DashboardFragment extends Fragment {
 
+    private final float TEXT_SIZE = 14f;
     private View mView;
     private CustomViewModel mViewModel;
     private String mSelectedYear;
+    private BarChart mBarChart;
+    private PieChart mPieChart;
 
     @Nullable
     @Override
@@ -51,59 +54,52 @@ public class DashboardFragment extends Fragment {
         for (String year : years) {
             createAndAddTab(tabLayout, year);
         }
-        mSelectedYear = "2022";
+        mSelectedYear = years.get(0);
 
         // get height of device
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int device_height_px = displayMetrics.heightPixels;
         int device_width_px = displayMetrics.widthPixels;
-        float textSize = 14f;
 
         // setup bar chart data
-        List<BarEntry> barEntries = setupBarData();
-        BarDataSet barDataSet = new BarDataSet(barEntries, "");
-        barDataSet.setValueFormatter(new CustomValueFormatter());
-        barDataSet.setValueTextSize(textSize);
-        barDataSet.setColors(setGreenRedColors(barEntries));
-        BarData barData = new BarData(barDataSet);
+        BarData barData = setupBarData();
+        mBarChart = mView.findViewById(R.id.bar_chart);
+        mBarChart.setMinimumHeight(device_height_px / 4 * 3);
+        mBarChart.setMinimumWidth(device_width_px);
 
-        BarChart barChart = mView.findViewById(R.id.bar_chart);
-        barChart.setMinimumHeight(device_height_px / 4 * 3);
-        barChart.setMinimumWidth(device_width_px);
-
-        barChart.setData(barData);
+        mBarChart.setData(barData);
         // how many bars are allowed to be seen at once
-        barChart.setVisibleXRangeMaximum(5);
+        mBarChart.setVisibleXRangeMaximum(5);
         float offset = device_width_px / 100f;
-        barChart.setExtraOffsets(offset * 1, 0, offset * 5, 0);
+        mBarChart.setExtraOffsets(offset * 1, 0, offset * 5, 0);
 
-        setBarChartAttributes(barChart);
-        barChart.invalidate(); // refresh chart
+        setBarChartAttributes(mBarChart);
+        mBarChart.invalidate(); // refresh chart
 
         // setup pie chart data
         List<PieEntry> pieEntries = setupPieData();
         PieDataSet pieDataSet = new PieDataSet(pieEntries, "");
         pieDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
-        pieDataSet.setValueTextSize(textSize);
+        pieDataSet.setValueTextSize(TEXT_SIZE);
         PieData pieData = new PieData(pieDataSet);
 
-        PieChart pieChart = mView.findViewById(R.id.pie_chart);
-        pieChart.setMinimumHeight(device_height_px);
-        pieChart.setData(pieData);
-        pieChart.animateXY(2000, 2000);
+        mPieChart = mView.findViewById(R.id.pie_chart);
+        mPieChart.setMinimumHeight(device_height_px);
+        mPieChart.setData(pieData);
+        mPieChart.animateXY(2000, 2000);
         // "Description Label" on bottom of graph
-        pieChart.getDescription().setEnabled(false);
+        mPieChart.getDescription().setEnabled(false);
         // legend on bottom of graph
-        pieChart.getLegend().setEnabled(false);
-        pieChart.invalidate(); // refresh chart
+        mPieChart.getLegend().setEnabled(false);
+        mPieChart.invalidate(); // refresh chart
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 mSelectedYear = tab.getText().toString();
-                barChart.setData(barData);
-                barChart.invalidate(); // refresh chart
+                mBarChart.setData(setupBarData());
+                mBarChart.invalidate(); // refresh chart
             }
 
             @Override
@@ -113,7 +109,7 @@ public class DashboardFragment extends Fragment {
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-
+                onTabSelected(tab);
             }
         });
 
@@ -128,22 +124,24 @@ public class DashboardFragment extends Fragment {
     }
 
     /*------------------------------ Bar Chart Helper Methods ------------------------------*/
-    private List<BarEntry> setupBarData() {
-        List<BarEntry> entries = new ArrayList<>();
+    private BarData setupBarData() {
+        List<BarEntry> barEntries = new ArrayList<>();
         // NOTE: Order of the entries added determines their position.
-        entries.add(new BarEntry(0, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-01")));
-        entries.add(new BarEntry(1, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-02")));
-        entries.add(new BarEntry(2, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-03")));
-        entries.add(new BarEntry(3, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-04")));
-        entries.add(new BarEntry(4, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-05")));
-        entries.add(new BarEntry(5, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-06")));
-        entries.add(new BarEntry(6, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-07")));
-        entries.add(new BarEntry(7, DatabaseAccessor.getExpenseAmount("2022" + "-08")));
-        entries.add(new BarEntry(8, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-09")));
-        entries.add(new BarEntry(9, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-10")));
-        entries.add(new BarEntry(10, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-11")));
-        entries.add(new BarEntry(11, DatabaseAccessor.getExpenseAmount(mSelectedYear + "-12")));
-        return entries;
+        for (int i = 0; i < 12; i++) {
+            String period = mSelectedYear;
+            if (i < 10) {
+                period += "-0" + i;
+            } else {
+                period += "-" + i;
+            }
+            barEntries.add(new BarEntry(i, DatabaseAccessor.getExpenseAmount(period)));
+        }
+        BarDataSet barDataSet = new BarDataSet(barEntries, "");
+        barDataSet.setValueFormatter(new CustomValueFormatter());
+        barDataSet.setValueTextSize(TEXT_SIZE);
+        barDataSet.setColors(setGreenRedColors(barEntries));
+
+        return new BarData(barDataSet);
     }
 
     private int[] setGreenRedColors(List<BarEntry> entries) {
@@ -224,33 +222,30 @@ public class DashboardFragment extends Fragment {
         private String getMonth(int month) {
             switch (month) {
                 case 0:
-                    return "January";
+                    return "Jan";
                 case 1:
-                    return "February";
+                    return "Feb";
                 case 2:
-                    return "March";
+                    return "Mar";
                 case 3:
-                    return "April";
+                    return "Apr";
                 case 4:
                     return "May";
                 case 5:
-                    return "June";
+                    return "Jun";
                 case 6:
-                    return "July";
+                    return "Jul";
                 case 7:
-                    return "August";
+                    return "Aug";
                 case 8:
-                    return "September";
+                    return "Sept";
                 case 9:
-                    return "October";
+                    return "Oct";
                 case 10:
-                    return "November";
-                case 11:
-                    return "December";
+                    return "Nov";
                 default:
-                    return "";
+                    return "Dec";
             }
-
         }
     }
 }

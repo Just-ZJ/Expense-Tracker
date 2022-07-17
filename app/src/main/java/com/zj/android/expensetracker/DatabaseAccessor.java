@@ -36,11 +36,6 @@ public class DatabaseAccessor {
         return new DatabaseCursorWrapper(cursor);
     }
 
-    private static DatabaseCursorWrapper queryExpenseYear(String sql, String[] whereArgs) {
-        Cursor cursor = mExpenseDataBase.rawQuery(sql, whereArgs);
-        return new DatabaseCursorWrapper(cursor);
-    }
-
     private static DatabaseCursorWrapper queryCategory(String whereClause, String[] whereArgs) {
         Cursor cursor = mCategoryDataBase.query(CategoryTable.NAME, null, whereClause,
                 whereArgs, null, null, null);
@@ -110,7 +105,7 @@ public class DatabaseAccessor {
                 + " FROM " + ExpenseTable.NAME
                 + " ORDER BY Year ASC;";
         String[] whereArgs = new String[]{};
-        DatabaseCursorWrapper cursor = queryExpenseYear(sql, whereArgs);
+        DatabaseCursorWrapper cursor = queryExpense(sql, whereArgs);
 
         try {
             cursor.moveToFirst();
