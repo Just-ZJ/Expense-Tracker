@@ -19,7 +19,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.zj.android.expensetracker.CustomDate;
 import com.zj.android.expensetracker.R;
 import com.zj.android.expensetracker.database.DatabaseAccessor;
-import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseTable;
 import com.zj.android.expensetracker.models.Expense;
 
 import java.util.Calendar;
@@ -92,11 +91,6 @@ public class TransactionFragment extends Fragment {
         @Override
         public int getChildrenCount(int i) {
             return DatabaseAccessor.getMonthYearCount(getGroup(i));
-//            List<Expense> tmp = mExpenses.get(getGroup(i));
-//            if (tmp != null) {
-//                return tmp.size();
-//            }
-//            return 1;
         }
 
         /**
@@ -115,14 +109,7 @@ public class TransactionFragment extends Fragment {
         @Override
         public Object getChild(int i, int i1) {
             // getChild(int groupPosition, int childPosition)
-            String whereClause = " WHERE strftime('%Y-%m', " + ExpenseTable.Cols.DATE + ") = '" + getGroup(i) + "'" +
-                    " ORDER BY " + ExpenseTable.Cols.DATE + " DESC";
-            return DatabaseAccessor.getExpenses(whereClause).get(i1);
-//            List<Expense> tmp = mExpenses.get(getGroup(i));
-//            if (tmp != null) {
-//                return tmp.get(i1);
-//            }
-//            return null;
+            return DatabaseAccessor.getExpenses(getGroup(i)).get(i1);
         }
 
         @Override

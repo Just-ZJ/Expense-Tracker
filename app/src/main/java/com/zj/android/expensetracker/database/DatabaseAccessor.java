@@ -41,7 +41,7 @@ public class DatabaseAccessor {
      * Example SQL Query:
      * SELECT SUM(amount) FROM expenses where strftime('%Y-%m',date) ='2021-07'
      *
-     * @param period in the form of "YYYY-MM" or "YYYY"
+     * @param period a string in the form of "YYYY-MM" or "YYYY"
      * @return the total amount of @period
      */
     public static float getExpenseAmount(String period) {
@@ -60,12 +60,16 @@ public class DatabaseAccessor {
     }
 
     /**
+     * @param period a string in the form of "YYYY-MM" or "YYYY"
      * @return List<Expense> of all expenses in the database
      */
-    public static List<Expense> getExpenses(String whereClause) {
+    public static List<Expense> getExpenses(String period) {
         List<Expense> expenses = new ArrayList<>();
-        String sql = "SELECT * FROM " + ExpenseTable.NAME + whereClause;
-        DatabaseCursorWrapper cursor = query(sql, null);
+        String sql = "SELECT * FROM " + ExpenseTable.NAME +
+                " WHERE strftime('%Y-%m', " + ExpenseTable.Cols.DATE + ") = ?" +
+                " ORDER BY " + ExpenseTable.Cols.DATE + " DESC";
+        String[] whereArgs = new String[]{period};
+        DatabaseCursorWrapper cursor = query(sql, whereArgs);
         try {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
