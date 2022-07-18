@@ -24,8 +24,8 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.tabs.TabLayout;
 import com.zj.android.expensetracker.CustomViewModel;
-import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
+import com.zj.android.expensetracker.database.DatabaseAccessor;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,8 +1,9 @@
-package com.zj.android.expensetracker;
+package com.zj.android.expensetracker.database;
 
 import android.database.Cursor;
 import android.database.CursorWrapper;
 
+import com.zj.android.expensetracker.CustomDate;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.CategoryTable;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseTable;
 import com.zj.android.expensetracker.models.Category;
