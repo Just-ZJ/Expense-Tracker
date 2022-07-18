@@ -26,7 +26,6 @@ import com.google.android.material.tabs.TabLayout;
 import com.zj.android.expensetracker.CustomViewModel;
 import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.R;
-import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,28 +67,17 @@ public class DashboardFragment extends Fragment {
         setupBarChart(device_height_px, device_width_px);
 
         // setup pie chart data
-        List<PieEntry> pieEntries = setupPieData();
-        PieDataSet pieDataSet = new PieDataSet(pieEntries, "");
-        pieDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
-        pieDataSet.setValueTextSize(TEXT_SIZE);
-        PieData pieData = new PieData(pieDataSet);
-
         mPieChart = mView.findViewById(R.id.pie_chart);
-        mPieChart.setMinimumHeight(device_height_px);
-        mPieChart.setData(pieData);
-        mPieChart.animateXY(2000, 2000);
-        // "Description Label" on bottom of graph
-        mPieChart.getDescription().setEnabled(false);
-        // legend on bottom of graph
-        mPieChart.getLegend().setEnabled(false);
-        mPieChart.invalidate(); // refresh chart
+        setupPieChart(device_height_px);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                mSelectedYear = tab.getText().toString();
+                mSelectedYear = tab.getText().toString(); // update year
                 mBarChart.setData(setupBarData());
                 mBarChart.invalidate(); // refresh chart
+                mPieChart.setData(setupPieData());
+                mPieChart.invalidate(); // refresh chart
             }
 
             @Override
@@ -205,17 +193,23 @@ public class DashboardFragment extends Fragment {
     }
 
     /*------------------------------ Pie Chart Helper Methods ------------------------------*/
-    private List<PieEntry> setupPieData() {
-        List<PieEntry> entries = new ArrayList<>();
-        String whereClause = " WHERE strftime('%Y-%m', " + ExpenseTable.Cols.DATE + ") = ''";
+    private void setupPieChart(int device_height_px) {
+        mPieChart.setMinimumHeight(device_height_px);
+        mPieChart.setData(setupPieData());
+        mPieChart.animateXY(2000, 2000);
+        // "Description Label" on bottom of graph
+        mPieChart.getDescription().setEnabled(false);
+        // legend on bottom of graph
+        mPieChart.getLegend().setEnabled(false);
+        mPieChart.invalidate(); // refresh chart
+    }
 
-        DatabaseAccessor.getExpenses(whereClause);
-        // NOTE: Order of the entries added determines their position.
-        entries.add(new PieEntry(18.5f, "Green"));
-        entries.add(new PieEntry(26.7f, "Yellow"));
-        entries.add(new PieEntry(24.0f, "Red"));
-        entries.add(new PieEntry(30.8f, "Blue"));
-        return entries;
+    private PieData setupPieData() {
+        List<PieEntry> pieEntries = DatabaseAccessor.getPieData(mSelectedYear);
+        PieDataSet pieDataSet = new PieDataSet(pieEntries, "hmm");
+        pieDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+        pieDataSet.setValueTextSize(TEXT_SIZE);
+        return new PieData(pieDataSet);
     }
 
     private static class CustomValueFormatter extends ValueFormatter {

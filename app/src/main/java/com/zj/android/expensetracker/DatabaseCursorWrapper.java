@@ -54,4 +54,5 @@ public class DatabaseCursorWrapper extends CursorWrapper {
 
         return expense;
     }
+
 }

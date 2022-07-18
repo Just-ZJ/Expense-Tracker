@@ -3,7 +3,9 @@ package com.zj.android.expensetracker;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
+import com.github.mikephil.charting.data.PieEntry;
 import com.zj.android.expensetracker.database.ExpenseDataBase;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.CategoryTable;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseTable;
@@ -36,7 +38,7 @@ public class DatabaseAccessor {
 
     /**
      * Get the total amount for all expenses in a particular month or year
-     *
+     * <p>
      * Example SQL Query:
      * SELECT SUM(amount) FROM expenses where strftime('%Y-%m',date) ='2021-07'
      *
@@ -187,10 +189,43 @@ public class DatabaseAccessor {
         return categories;
     }
 
+    /**
+     * SELECT c.name, SUM(amount)
+     * FROM expenses as e LEFT OUTER JOIN categories as c on e.category_uuid = c.uuid
+     * WHERE strftime('%Y', date) = '2022'
+     * GROUP BY c.name
+     */
+    public static List<PieEntry> getPieData(String period) {
+        List<PieEntry> entries = new ArrayList<>();
+        String sql = String.format(
+                "SELECT c.%s AS Category, SUM(e.%s) AS Total " +
+                        "FROM %s AS e LEFT OUTER JOIN %s AS c ON e.%s = c.%s " +
+                        "WHERE strftime('%%Y', %s) = '%s' " +
+                        "GROUP BY Category ",
+                CategoryTable.Cols.NAME, ExpenseTable.Cols.AMOUNT,
+                ExpenseTable.NAME, CategoryTable.NAME, ExpenseTable.Cols.CATEGORY_UUID, CategoryTable.Cols.UUID,
+                ExpenseTable.Cols.DATE, period
+        );
+        Log.i("tryout", "getPieData: " + sql);
+        DatabaseCursorWrapper cursor = query(sql, null);
+        try {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                entries.add(new PieEntry((float) cursor.getDouble("Total"),
+                        cursor.getString("Category")));
+                cursor.moveToNext();
+            }
+        } finally {
+            cursor.close();
+        }
+        return entries;
+    }
+
     public static void removeCategory(String name) {
         String whereClause = CategoryTable.Cols.NAME + " = ?";
         String[] whereArgs = new String[]{name};
         mDataBase.delete(CategoryTable.NAME, whereClause, whereArgs);
     }
+
 
 }
