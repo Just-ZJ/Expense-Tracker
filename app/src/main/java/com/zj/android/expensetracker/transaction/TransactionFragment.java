@@ -169,7 +169,7 @@ public class TransactionFragment extends Fragment {
             Calendar cal = expense.getDate().getCalendar();
             String amount = String.format("$%.2f", expense.getAmount());
             String details = expense.getDetails();
-            String categories = DatabaseAccessor.getExpenseCategories(expense);
+            String categories = expense.getCategory();
             if (view == null) {
                 LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(R.layout.fragment_transaction_expandable_item, null);

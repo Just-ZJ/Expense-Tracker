@@ -30,12 +30,10 @@ import com.zj.android.expensetracker.R;
 import com.zj.android.expensetracker.database.ExpenseDataBase;
 import com.zj.android.expensetracker.models.Category;
 import com.zj.android.expensetracker.models.Expense;
-import com.zj.android.expensetracker.models.ExpenseToCategory;
 
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.TimeZone;
-import java.util.UUID;
 
 public class AddItemFragment extends Fragment {
 
@@ -43,7 +41,7 @@ public class AddItemFragment extends Fragment {
             "Subscriptions", "Miscellaneous"};
     private TextView mDateTextView;
     private ImageView mSelectDateImageView;
-    private TextView mSelectedCategoriesTextView;
+    private String mSelectedCategory;
     private ChipGroup mCategoriesChipGroup;
     private EditText mExpenseDetailsEditText;
     private EditText mAmountEditText;
@@ -76,7 +74,7 @@ public class AddItemFragment extends Fragment {
         mSelectDateImageView = mView.findViewById(R.id.imageView_select_date);
         mSelectDateImageView.setOnClickListener(view -> createDatePicker());
 
-        mSelectedCategoriesTextView = mView.findViewById(R.id.textView_selected_categories);
+//        mSelectedCategoryTextView = mView.findViewById(R.id.textView_selected_categories);
         mCategoriesChipGroup = mView.findViewById(R.id.chipGroup_expense_category);
         populateChipGroup();
 
@@ -118,18 +116,13 @@ public class AddItemFragment extends Fragment {
         mAddExpenseButton = mView.findViewById(R.id.add_expense_button);
         mAddExpenseButton.setOnClickListener(view -> {
             Expense expense = new Expense(new CustomDate(mCalendarSelectedDate),
-                    mSelectedCategoriesTextView.getText().toString(),
+                    mSelectedCategory,
                     mExpenseDetailsEditText.getText().toString(),
                     Double.valueOf(mAmountEditText.getText().toString()));
             // add expense to databases
             mExpenseDataBase.addExpense(expense);
-            String[] categories = expense.getCategories().split(", ");
-            for (String s : categories) {
-                Category category = DatabaseAccessor.getCategoryByName(s);
-                ExpenseToCategory expenseToCategory = new ExpenseToCategory(
-                        UUID.fromString(expense.getId().toString()), UUID.fromString(category.getId().toString()));
-                mExpenseDataBase.addCategory(expenseToCategory);
-            }
+//            Category category = DatabaseAccessor.getCategoryByName();
+
             // store expense to view model
 //            mViewModel.setNewExpense(expense);
 
@@ -192,41 +185,10 @@ public class AddItemFragment extends Fragment {
      * Clears all fields of the form and reset it to default
      */
     private void clearFields() {
-        mSelectedCategoriesTextView.setText("");
+        mSelectedCategory = "";
         mExpenseDetailsEditText.setText("");
         mAmountEditText.setText("0.00");
         mCategoriesChipGroup.clearCheck();
-    }
-
-    /**
-     * Updates {@code mSelectedCategoriesTextView} with what chip was selected by the user
-     *
-     * @param category the name of a category chip
-     */
-    private void updateSelectedCategoriesTextView(String category) {
-        StringBuilder text = new StringBuilder((String) mSelectedCategoriesTextView.getText());
-        int pos = text.indexOf(category);
-        switch (pos) {
-            case -1:
-                // add category
-                if (text.length() != 0) text.append(", ");
-                text.append(category);
-                break;
-            case 0:
-                // remove category for index 0
-                text.delete(0, category.length());
-                break;
-            default:
-                // remove category for non index 0
-                text.delete(pos - 2, pos + category.length());
-        }
-        // removes remaining spaces and commas at the start of string after deletion
-        if (text.length() > 0) {
-            while (text.charAt(0) == ',' || text.charAt(0) == ' ') {
-                text.deleteCharAt(0);
-            }
-        }
-        mSelectedCategoriesTextView.setText(text.toString());
     }
 
     /**
@@ -272,7 +234,8 @@ public class AddItemFragment extends Fragment {
                 // customize default chips
                 newChip.setCloseIconVisible(false);
             }
-            newChip.setOnClickListener(view -> updateSelectedCategoriesTextView(category));
+            //TODO: make it so that only can select 1 category
+            newChip.setOnClickListener(view -> mSelectedCategory = newChip.getText().toString());
             newChip.setOnCloseIconClickListener(v -> removeChip(v, newChip.getText().toString()));
         }
         return newChip;
@@ -307,8 +270,6 @@ public class AddItemFragment extends Fragment {
     private void removeChip(View v, String categoryName) {
         // remove from chip group
         mCategoriesChipGroup.removeView(v);
-        // remove from textview
-        updateSelectedCategoriesTextView(categoryName);
         // remove from database
         DatabaseAccessor.removeCategory(categoryName);
     }

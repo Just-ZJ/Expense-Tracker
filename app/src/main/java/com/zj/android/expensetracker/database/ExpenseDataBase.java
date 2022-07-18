@@ -6,13 +6,11 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.zj.android.expensetracker.DatabaseAccessor;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.CategoryTable;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseTable;
-import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseTable.Cols;
-import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseToCategoryTable;
 import com.zj.android.expensetracker.models.Category;
 import com.zj.android.expensetracker.models.Expense;
-import com.zj.android.expensetracker.models.ExpenseToCategory;
 
 public class ExpenseDataBase extends SQLiteOpenHelper {
     private static final int VERSION = 1;
@@ -24,11 +22,12 @@ public class ExpenseDataBase extends SQLiteOpenHelper {
 
     private static ContentValues getContentValues(Expense expense) {
         ContentValues values = new ContentValues();
-        values.put(Cols.UUID, expense.getId().toString());
+        values.put(ExpenseTable.Cols.UUID, expense.getId().toString());
         // date type is stored as String in database - ISO 8601 format
-        values.put(Cols.DATE, expense.getDate().toDatabaseString());
-        values.put(Cols.DETAILS, expense.getDetails());
-        values.put(Cols.AMOUNT, expense.getAmount());
+        values.put(ExpenseTable.Cols.DATE, expense.getDate().toDatabaseString());
+        values.put(ExpenseTable.Cols.CATEGORY_UUID, DatabaseAccessor.getCategoryByName(expense.getCategory()).getId().toString());
+        values.put(ExpenseTable.Cols.DETAILS, expense.getDetails());
+        values.put(ExpenseTable.Cols.AMOUNT, expense.getAmount());
         return values;
     }
 
@@ -39,23 +38,17 @@ public class ExpenseDataBase extends SQLiteOpenHelper {
         return values;
     }
 
-    private static ContentValues getContentValues(ExpenseToCategory expenseToCategory) {
-        ContentValues values = new ContentValues();
-        values.put(ExpenseToCategoryTable.Cols.UUID, expenseToCategory.getId().toString());
-        values.put(ExpenseToCategoryTable.Cols.EXPENSE_UUID, expenseToCategory.getExpenseId().toString());
-        values.put(ExpenseToCategoryTable.Cols.CATEGORY_UUID, expenseToCategory.getCategoryId().toString());
-        return values;
-    }
-
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         // Expense Table
         sqLiteDatabase.execSQL("CREATE TABLE " + ExpenseTable.NAME + "(" +
                 " id integer PRIMARY KEY AUTOINCREMENT, " +
-                Cols.UUID + " text NOT NULL UNIQUE, " +
-                Cols.DATE + " date NOT NULL, " +
-                Cols.DETAILS + " text, " +
-                Cols.AMOUNT + " NOT NULL" +
+                ExpenseTable.Cols.UUID + " text NOT NULL UNIQUE, " +
+                ExpenseTable.Cols.DATE + " date NOT NULL, " +
+                ExpenseTable.Cols.CATEGORY_UUID + " date NOT NULL, " +
+                ExpenseTable.Cols.DETAILS + " text, " +
+                ExpenseTable.Cols.AMOUNT + " NOT NULL, " +
+                "FOREIGN KEY (" + ExpenseTable.Cols.CATEGORY_UUID + ") REFERENCES " + CategoryTable.NAME + "(" + CategoryTable.Cols.UUID + ") " +
                 ")"
         );
         // Category Table
@@ -64,17 +57,6 @@ public class ExpenseDataBase extends SQLiteOpenHelper {
                 CategoryTable.Cols.UUID + " text NOT NULL UNIQUE, " +
                 CategoryTable.Cols.NAME + " varchar(25) NOT NULL UNIQUE " +
                 ")"
-        );
-        // ExpenseToCategory Table
-        sqLiteDatabase.execSQL(
-                "CREATE TABLE " + ExpenseToCategoryTable.NAME + "(" +
-                        " id integer PRIMARY KEY AUTOINCREMENT, " +
-                        ExpenseToCategoryTable.Cols.UUID + " text NOT NULL UNIQUE, " +
-                        ExpenseToCategoryTable.Cols.EXPENSE_UUID + " text NOT NULL, " +
-                        ExpenseToCategoryTable.Cols.CATEGORY_UUID + " text NOT NULL, " +
-                        "FOREIGN KEY (" + ExpenseToCategoryTable.Cols.EXPENSE_UUID + ") REFERENCES " + ExpenseTable.NAME + "(" + ExpenseTable.Cols.UUID + "), " +
-                        "FOREIGN KEY (" + ExpenseToCategoryTable.Cols.CATEGORY_UUID + ") REFERENCES " + CategoryTable.NAME + "(" + CategoryTable.Cols.UUID + ") " +
-                        ")"
         );
     }
 
@@ -95,17 +77,10 @@ public class ExpenseDataBase extends SQLiteOpenHelper {
         database.close();
     }
 
-    public void addCategory(ExpenseToCategory expenseToCategory) {
-        SQLiteDatabase database = this.getWritableDatabase();
-        database.insert(ExpenseToCategoryTable.NAME, null, getContentValues(expenseToCategory));
-        database.close();
-    }
-
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ExpenseTable.NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CategoryTable.NAME);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ExpenseToCategoryTable.NAME);
         onCreate(sqLiteDatabase);
     }
 }

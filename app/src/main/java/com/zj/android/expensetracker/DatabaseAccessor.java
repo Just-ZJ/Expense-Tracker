@@ -7,10 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import com.zj.android.expensetracker.database.ExpenseDataBase;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.CategoryTable;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseTable;
-import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseToCategoryTable;
 import com.zj.android.expensetracker.models.Category;
 import com.zj.android.expensetracker.models.Expense;
-import com.zj.android.expensetracker.models.ExpenseToCategory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -193,27 +191,6 @@ public class DatabaseAccessor {
         String whereClause = CategoryTable.Cols.NAME + " = ?";
         String[] whereArgs = new String[]{name};
         mDataBase.delete(CategoryTable.NAME, whereClause, whereArgs);
-    }
-
-    public static String getExpenseCategories(Expense expense) {
-        String categories = "";
-        String sql = "SELECT * FROM " + ExpenseToCategoryTable.NAME + " WHERE " + ExpenseToCategoryTable.Cols.EXPENSE_UUID + " = ?";
-        String[] whereArgs = new String[]{expense.getId().toString()};
-        DatabaseCursorWrapper cursor = query(sql, whereArgs);
-        try {
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast()) {
-                if (!cursor.isFirst()) {
-                    categories += ", ";
-                }
-                ExpenseToCategory expenseToCategory = cursor.getExpenseToCategory();
-                categories += getCategoryByUUID(expenseToCategory.getCategoryId().toString()).getName();
-                cursor.moveToNext();
-            }
-        } finally {
-            cursor.close();
-        }
-        return categories;
     }
 
 }

@@ -7,6 +7,7 @@ public class ExpenseDbSchema {
         public static final class Cols {
             public static final String UUID = "uuid";
             public static final String DATE = "date";
+            public static final String CATEGORY_UUID = "category_uuid";
             public static final String DETAILS = "details";
             public static final String AMOUNT = "amount";
         }
@@ -21,16 +22,4 @@ public class ExpenseDbSchema {
             public static final String NAME = "name";
         }
     }
-
-    public static final class ExpenseToCategoryTable {
-        public static final String NAME = "expenseToCategories";
-
-        // all unique categories of expenses
-        public static final class Cols {
-            public static final String UUID = "uuid";
-            public static final String EXPENSE_UUID = "expense_uuid";
-            public static final String CATEGORY_UUID = "category_uuid";
-        }
-    }
-
 }

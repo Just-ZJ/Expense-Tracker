@@ -8,7 +8,7 @@ public class Expense {
 
     private final UUID mId;
     private CustomDate mDate;
-    private String mCategories;
+    private String mCategory;
     private String mDetails;
     private Double mAmount;
 
@@ -20,10 +20,10 @@ public class Expense {
         this(UUID.randomUUID());
     }
 
-    public Expense(CustomDate date, String categories, String details, Double amount) {
+    public Expense(CustomDate date, String category, String details, Double amount) {
         this(UUID.randomUUID());
         setDate(date);
-        setCategories(categories);
+        setCategory(category);
         setDetails(details);
         setAmount(amount);
     }
@@ -40,12 +40,12 @@ public class Expense {
         mDate = date;
     }
 
-    public String getCategories() {
-        return mCategories;
+    public String getCategory() {
+        return mCategory;
     }
 
-    public void setCategories(String categories) {
-        mCategories = categories;
+    public void setCategory(String category) {
+        mCategory = category;
     }
 
     public String getDetails() {
