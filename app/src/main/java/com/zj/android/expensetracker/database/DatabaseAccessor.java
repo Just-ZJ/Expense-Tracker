@@ -3,7 +3,6 @@ package com.zj.android.expensetracker.database;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.github.mikephil.charting.data.PieEntry;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.CategoryTable;
@@ -209,7 +208,6 @@ public class DatabaseAccessor {
                 ExpenseTable.NAME, CategoryTable.NAME, ExpenseTable.Cols.CATEGORY_UUID, CategoryTable.Cols.UUID,
                 ExpenseTable.Cols.DATE, period
         );
-        Log.i("tryout", "getPieData: " + sql);
         DatabaseCursorWrapper cursor = query(sql, null);
         try {
             cursor.moveToFirst();

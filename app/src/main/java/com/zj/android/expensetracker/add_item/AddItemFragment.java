@@ -37,7 +37,7 @@ import java.util.TimeZone;
 
 public class AddItemFragment extends Fragment {
 
-    private final String[] DEFAULT_CATEGORIES = new String[]{"Grocery", "Fuel", "Dining",
+    private final String[] DEFAULT_CATEGORIES = new String[]{"Salary", "Grocery", "Fuel", "Dining",
             "Subscriptions", "Miscellaneous"};
     private TextView mDateTextView;
     private ImageView mSelectDateImageView;
@@ -59,6 +59,7 @@ public class AddItemFragment extends Fragment {
 
         DatabaseAccessor databaseAccessor = new DatabaseAccessor(requireContext());
         mExpenseDataBase = new ExpenseDataBase(this.getContext());
+//        mExpenseDataBase.databaseSeeder();
 
         mView = inflater.inflate(R.layout.activity_add_item, container, false);
         mDateTextView = mView.findViewById(R.id.textView_date);
@@ -121,7 +122,6 @@ public class AddItemFragment extends Fragment {
                     Double.valueOf(mAmountEditText.getText().toString()));
             // add expense to databases
             mExpenseDataBase.addExpense(expense);
-//            Category category = DatabaseAccessor.getCategoryByName();
 
             // store expense to view model
 //            mViewModel.setNewExpense(expense);

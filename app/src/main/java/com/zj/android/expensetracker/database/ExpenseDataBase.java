@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.zj.android.expensetracker.CustomDate;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.CategoryTable;
 import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseTable;
 import com.zj.android.expensetracker.models.Category;
@@ -74,6 +75,25 @@ public class ExpenseDataBase extends SQLiteOpenHelper {
             // TODO: alert user if they added duplicated categories maybe? check if user added using boolean?
         }
         database.close();
+    }
+
+    public void databaseSeeder() {
+        String[] category = new String[]{"Grocery", "Fuel", "Dining",
+                "Subscriptions", "Miscellaneous"};
+        for (int year = 2022; year >= 2019; year--) {
+            if (year == 2018) break;
+            for (int i = 1; i <= 12; i++) {
+                for (int j = 0; j < 5; j++) {
+                    String date = String.format("%d-%02d-%02d 12:00:00", year, i, j);
+                    double amt = -100.00 + Math.random() * -500.00;
+                    Expense expense = new Expense(new CustomDate(date), category[(int) (Math.random() * 4)], "Some details here.", amt);
+                    addExpense(expense);
+                }
+                String date = String.format("%d-%02d-01 12:00:00", year, i);
+                Expense expense = new Expense(new CustomDate(date), "Salary", "Some details here.", 2000.00);
+                addExpense(expense);
+            }
+        }
     }
 
     @Override

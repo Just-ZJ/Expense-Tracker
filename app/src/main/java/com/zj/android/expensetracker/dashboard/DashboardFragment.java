@@ -29,6 +29,7 @@ import com.zj.android.expensetracker.database.DatabaseAccessor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class DashboardFragment extends Fragment {
@@ -121,12 +122,7 @@ public class DashboardFragment extends Fragment {
         List<BarEntry> barEntries = new ArrayList<>();
         // NOTE: Order of the entries added determines their position.
         for (int i = 0; i < 12; i++) {
-            String period = mSelectedYear;
-            if (i < 10) {
-                period += "-0" + i;
-            } else {
-                period += "-" + i;
-            }
+            String period = String.format(Locale.getDefault(), "%s-%02d", mSelectedYear, i + 1);
             barEntries.add(new BarEntry(i, DatabaseAccessor.getExpenseAmount(period)));
         }
         BarDataSet barDataSet = new BarDataSet(barEntries, "");
@@ -216,8 +212,9 @@ public class DashboardFragment extends Fragment {
 
         @Override
         public String getBarLabel(BarEntry barEntry) {
-            String val = "$" + super.getBarLabel(barEntry);
-            if (barEntry.getY() < 0) val = "-$" + (barEntry.getY() * -1);
+            String val = barEntry.getY() < 0 ?
+                    String.format(Locale.getDefault(), "-$%.2f", barEntry.getY() * -1) :
+                    String.format(Locale.getDefault(), "$%.2f", barEntry.getY());
             return getMonth((int) barEntry.getX()) + ": " + val;
         }
 
