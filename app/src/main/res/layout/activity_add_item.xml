@@ -40,10 +40,10 @@
             android:layout_marginRight="8dp"
             android:text="@string/label_selected_categories" />
 
-        <TextView
-            android:id="@+id/textView_selected_categories"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <!--        <TextView-->
+        <!--            android:id="@+id/textView_selected_categories"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content" />-->
     </LinearLayout>
 
 

@@ -75,8 +75,8 @@ public class AddItemFragment extends Fragment {
         mSelectDateImageView = mView.findViewById(R.id.imageView_select_date);
         mSelectDateImageView.setOnClickListener(view -> createDatePicker());
 
-//        mSelectedCategoryTextView = mView.findViewById(R.id.textView_selected_categories);
         mCategoriesChipGroup = mView.findViewById(R.id.chipGroup_expense_category);
+        mCategoriesChipGroup.setSingleSelection(true);
         populateChipGroup();
 
         mExpenseDetailsEditText = mView.findViewById(R.id.editText_expense_details);
@@ -235,7 +235,10 @@ public class AddItemFragment extends Fragment {
                 newChip.setCloseIconVisible(false);
             }
             //TODO: make it so that only can select 1 category
-            newChip.setOnClickListener(view -> mSelectedCategory = newChip.getText().toString());
+            newChip.setOnClickListener(view -> {
+                mCategoriesChipGroup.check(view.getId());
+                mSelectedCategory = newChip.getText().toString();
+            });
             newChip.setOnCloseIconClickListener(v -> removeChip(v, newChip.getText().toString()));
         }
         return newChip;
