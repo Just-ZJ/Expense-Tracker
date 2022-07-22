@@ -40,6 +40,7 @@ public class DashboardFragment extends Fragment {
     private String mSelectedYear;
     private BarChart mBarChart;
     private PieChart mPieChart;
+    private TabLayout mTabLayout;
 
     @Nullable
     @Override
@@ -50,10 +51,10 @@ public class DashboardFragment extends Fragment {
         DatabaseAccessor databaseAccessor = new DatabaseAccessor(requireContext());
 
         // populate years in the tab layout at the top
-        TabLayout tabLayout = mView.findViewById(R.id.graph_tab_layout);
+        mTabLayout = mView.findViewById(R.id.graph_tab_layout);
         List<String> years = DatabaseAccessor.getYears();
         for (String year : years) {
-            createAndAddTab(tabLayout, year);
+            createAndAddTab(mTabLayout, year);
         }
         if (years.size() > 0) mSelectedYear = years.get(0);
 
@@ -71,7 +72,7 @@ public class DashboardFragment extends Fragment {
         mPieChart = mView.findViewById(R.id.pie_chart);
         setupPieChart(device_height_px);
 
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 mSelectedYear = tab.getText().toString(); // update year
@@ -93,6 +94,23 @@ public class DashboardFragment extends Fragment {
         });
 
         return mView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        List<String> years = DatabaseAccessor.getYears();
+        if (years.size() != mTabLayout.getTabCount()) {
+            mTabLayout.removeAllTabs();
+            for (String year : years) {
+                createAndAddTab(mTabLayout, year);
+            }
+            if (years.size() > 0) mSelectedYear = years.get(0);
+        }
+        mBarChart.setData(setupBarData());
+        mBarChart.invalidate(); // refresh chart
+        mPieChart.setData(setupPieData());
+        mPieChart.invalidate(); // refresh chart
     }
 
     /*------------------------------ Helper Methods ------------------------------*/
