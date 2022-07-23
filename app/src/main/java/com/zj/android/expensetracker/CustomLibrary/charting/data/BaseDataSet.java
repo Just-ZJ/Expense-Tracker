@@ -147,6 +147,17 @@ public abstract class BaseDataSet<T extends Entry> implements IDataSet<T> {
         this.mColors = ColorTemplate.createColors(colors);
     }
 
+    public void setExpenseColors(List<BarEntry> entries) {
+        int len = entries.size(),
+                red = ColorTemplate.getNegativeRed(),
+                green = ColorTemplate.getPositiveGreen();
+        int[] colors = new int[len];
+        for (int i = 0; i < len; i++) {
+            colors[i] = entries.get(i).getY() < 0 ? red : green;
+        }
+        setColors(colors);
+    }
+
     public List<Integer> getValueColors() {
         return mValueColors;
     }

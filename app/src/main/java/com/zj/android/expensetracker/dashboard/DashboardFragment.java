@@ -1,6 +1,5 @@
 package com.zj.android.expensetracker.dashboard;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -21,7 +20,6 @@ import com.zj.android.expensetracker.CustomLibrary.charting.data.BarEntry;
 import com.zj.android.expensetracker.CustomLibrary.charting.data.PieData;
 import com.zj.android.expensetracker.CustomLibrary.charting.data.PieDataSet;
 import com.zj.android.expensetracker.CustomLibrary.charting.data.PieEntry;
-import com.zj.android.expensetracker.CustomLibrary.charting.formatter.ValueFormatter;
 import com.zj.android.expensetracker.CustomLibrary.charting.utils.ColorTemplate;
 import com.zj.android.expensetracker.CustomViewModel;
 import com.zj.android.expensetracker.R;
@@ -142,30 +140,13 @@ public class DashboardFragment extends Fragment {
         for (int i = 0; i < 12; i++) {
             String period = String.format(Locale.getDefault(), "%s-%02d", mSelectedYear, i + 1);
             barEntries.add(new BarEntry(i, DatabaseAccessor.getExpenseAmount(period)));
-//            float amount = DatabaseAccessor.getExpenseAmount(period);
-//            if(amount != 0) barEntries.add(new BarEntry(i, DatabaseAccessor.getExpenseAmount(period)));
         }
         BarDataSet barDataSet = new BarDataSet(barEntries, "");
-        barDataSet.setValueFormatter(new CustomValueFormatter());
         barDataSet.setValueTextSize(TEXT_SIZE);
-        barDataSet.setColors(setGreenRedColors(barEntries));
-
+        barDataSet.setExpenseColors(barEntries);
         return new BarData(barDataSet);
     }
 
-    private int[] setGreenRedColors(List<BarEntry> entries) {
-        int[] colors = new int[entries.size()];
-        for (int i = 0; i < entries.size(); i++) {
-            if (entries.get(i).getY() < 0) {
-                // red if negative
-                colors[i] = Color.rgb(158, 0, 0);
-            } else {
-                // green if positive
-                colors[i] = Color.rgb(0, 128, 0);
-            }
-        }
-        return colors;
-    }
 
     private void setBarChartAttributes(BarChart barChart) {
         barChart.animateXY(2000, 2000);
@@ -227,44 +208,4 @@ public class DashboardFragment extends Fragment {
         return new PieData(pieDataSet);
     }
 
-    private static class CustomValueFormatter extends ValueFormatter {
-
-        @Override
-        public String getBarLabel(BarEntry barEntry) {
-            String val = barEntry.getY() < 0 ?
-                    String.format(Locale.getDefault(), "-$%.2f", barEntry.getY() * -1) :
-                    String.format(Locale.getDefault(), "$%.2f", barEntry.getY());
-            return getMonth((int) barEntry.getX()) + ": " + val;
-        }
-
-
-        private String getMonth(int month) {
-            switch (month) {
-                case 0:
-                    return "Jan";
-                case 1:
-                    return "Feb";
-                case 2:
-                    return "Mar";
-                case 3:
-                    return "Apr";
-                case 4:
-                    return "May";
-                case 5:
-                    return "Jun";
-                case 6:
-                    return "Jul";
-                case 7:
-                    return "Aug";
-                case 8:
-                    return "Sept";
-                case 9:
-                    return "Oct";
-                case 10:
-                    return "Nov";
-                default:
-                    return "Dec";
-            }
-        }
-    }
 }

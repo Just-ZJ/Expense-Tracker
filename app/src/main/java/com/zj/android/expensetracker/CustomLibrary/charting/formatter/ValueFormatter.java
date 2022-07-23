@@ -8,6 +8,9 @@ import com.zj.android.expensetracker.CustomLibrary.charting.data.Entry;
 import com.zj.android.expensetracker.CustomLibrary.charting.data.PieEntry;
 import com.zj.android.expensetracker.CustomLibrary.charting.data.RadarEntry;
 import com.zj.android.expensetracker.CustomLibrary.charting.utils.ViewPortHandler;
+import com.zj.android.expensetracker.HelperMethods;
+
+import java.util.Locale;
 
 /**
  * Class to format all values before they are drawn as labels.
@@ -70,7 +73,14 @@ public abstract class ValueFormatter implements IAxisValueFormatter, IValueForma
      * @return formatted string label
      */
     public String getBarLabel(BarEntry barEntry) {
-        return getFormattedValue(barEntry.getY());
+        return HelperMethods.getMonth((int) barEntry.getX());
+    }
+
+    public String getAmountLabel(BarEntry barEntry) {
+        float value = barEntry.getY();
+        return value < 0 ?
+                String.format(Locale.getDefault(), "-$%.2f", value * -1) :
+                String.format(Locale.getDefault(), "$%.2f", value);
     }
 
     /**
@@ -102,7 +112,9 @@ public abstract class ValueFormatter implements IAxisValueFormatter, IValueForma
      * @return formatted string label
      */
     public String getPieLabel(float value, PieEntry pieEntry) {
-        return getFormattedValue(value);
+        return value < 0 ?
+                String.format(Locale.getDefault(), "-$%.2f", value * -1) :
+                String.format(Locale.getDefault(), "$%.2f", value);
     }
 
     /**

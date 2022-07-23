@@ -78,6 +78,16 @@ public class ColorTemplate {
         return Color.rgb(51, 181, 229);
     }
 
+    public static int getPositiveGreen() {
+        //#00873c
+        return Color.rgb(0, 135, 60);
+    }
+
+    public static int getNegativeRed() {
+        //#eb0f29
+        return Color.rgb(235, 15, 41);
+    }
+
     /**
      * Sets the alpha component of the given color.
      *

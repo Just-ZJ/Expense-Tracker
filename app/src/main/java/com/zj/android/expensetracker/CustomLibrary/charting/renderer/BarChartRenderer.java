@@ -274,7 +274,12 @@ public class BarChartRenderer extends BarLineScatterCandleBubbleRenderer {
                         float val = entry.getY();
 
                         if (dataSet.isDrawValuesEnabled()) {
+                            // difference between offsets needs to stay the same after multiplication
                             drawValue(c, formatter.getBarLabel(entry), x, val >= 0 ?
+                                            (buffer.buffer[j + 1] + posOffset * 5) :
+                                            (buffer.buffer[j + 3] + negOffset * 2.21739130434783f),
+                                    dataSet.getValueTextColor(j / 4));
+                            drawValue(c, formatter.getAmountLabel(entry), x, val >= 0 ?
                                             (buffer.buffer[j + 1] + posOffset) :
                                             (buffer.buffer[j + 3] + negOffset),
                                     dataSet.getValueTextColor(j / 4));
