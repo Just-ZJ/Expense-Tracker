@@ -42,12 +42,12 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.github.mikephil.charting.charts.BarChart
+            <com.zj.android.expensetracker.CustomLibrary.charting.charts.BarChart
                 android:id="@+id/bar_chart"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <com.github.mikephil.charting.charts.PieChart
+            <com.zj.android.expensetracker.CustomLibrary.charting.charts.PieChart
                 android:id="@+id/pie_chart"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

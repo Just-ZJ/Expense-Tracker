@@ -12,17 +12,17 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.tabs.TabLayout;
+import com.zj.android.expensetracker.CustomLibrary.charting.charts.BarChart;
+import com.zj.android.expensetracker.CustomLibrary.charting.charts.PieChart;
+import com.zj.android.expensetracker.CustomLibrary.charting.data.BarData;
+import com.zj.android.expensetracker.CustomLibrary.charting.data.BarDataSet;
+import com.zj.android.expensetracker.CustomLibrary.charting.data.BarEntry;
+import com.zj.android.expensetracker.CustomLibrary.charting.data.PieData;
+import com.zj.android.expensetracker.CustomLibrary.charting.data.PieDataSet;
+import com.zj.android.expensetracker.CustomLibrary.charting.data.PieEntry;
+import com.zj.android.expensetracker.CustomLibrary.charting.formatter.ValueFormatter;
+import com.zj.android.expensetracker.CustomLibrary.charting.utils.ColorTemplate;
 import com.zj.android.expensetracker.CustomViewModel;
 import com.zj.android.expensetracker.R;
 import com.zj.android.expensetracker.database.DatabaseAccessor;
@@ -142,6 +142,8 @@ public class DashboardFragment extends Fragment {
         for (int i = 0; i < 12; i++) {
             String period = String.format(Locale.getDefault(), "%s-%02d", mSelectedYear, i + 1);
             barEntries.add(new BarEntry(i, DatabaseAccessor.getExpenseAmount(period)));
+//            float amount = DatabaseAccessor.getExpenseAmount(period);
+//            if(amount != 0) barEntries.add(new BarEntry(i, DatabaseAccessor.getExpenseAmount(period)));
         }
         BarDataSet barDataSet = new BarDataSet(barEntries, "");
         barDataSet.setValueFormatter(new CustomValueFormatter());
@@ -168,7 +170,6 @@ public class DashboardFragment extends Fragment {
     private void setBarChartAttributes(BarChart barChart) {
         barChart.animateXY(2000, 2000);
 
-        barChart.setTouchEnabled(true);
         barChart.setClickable(false);
         // zooming in of graph
         barChart.setDoubleTapToZoomEnabled(false);
@@ -235,6 +236,7 @@ public class DashboardFragment extends Fragment {
                     String.format(Locale.getDefault(), "$%.2f", barEntry.getY());
             return getMonth((int) barEntry.getX()) + ": " + val;
         }
+
 
         private String getMonth(int month) {
             switch (month) {
