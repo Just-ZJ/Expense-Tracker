@@ -191,12 +191,13 @@ public class DashboardFragment extends Fragment {
     /*------------------------------ Pie Chart Helper Methods ------------------------------*/
     private void setupPieChart(int device_height_px) {
         mPieChart.setMinimumHeight(device_height_px);
-        mPieChart.setData(setupPieData());
+        PieData data = setupPieData();
+        mPieChart.setData(data);
         mPieChart.animateXY(2000, 2000);
-        // "Description Label" on bottom of graph
-        mPieChart.getDescription().setEnabled(false);
-        // legend on bottom of graph
-        mPieChart.getLegend().setEnabled(false);
+
+        mPieChart.getDescription().setEnabled(false); // remove "Description Label" on bottom of graph
+        mPieChart.getLegend().setEnabled(false); // remove legend on bottom of graph
+        mPieChart.setHoleColor(ColorTemplate.COLOR_NONE); //set middle area of pie graph to transparent
         mPieChart.invalidate(); // refresh chart
     }
 

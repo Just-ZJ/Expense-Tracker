@@ -301,9 +301,10 @@ public abstract class Chart<T extends ChartData<? extends IDataSet<? extends Ent
         mDescPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         mInfoPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mInfoPaint.setColor(Color.rgb(247, 189, 51)); // orange
+        mInfoPaint.setColor(Color.rgb(0, 0, 0)); // black
         mInfoPaint.setTextAlign(Align.CENTER);
-        mInfoPaint.setTextSize(Utils.convertDpToPixel(12f));
+        mInfoPaint.setFakeBoldText(true); // bold text
+        mInfoPaint.setTextSize(Utils.convertDpToPixel(16f));
 
         if (mLogEnabled)
             Log.i("", "Chart.init()");
@@ -391,7 +392,8 @@ public abstract class Chart<T extends ChartData<? extends IDataSet<? extends Ent
     protected void onDraw(Canvas canvas) {
         // super.onDraw(canvas);
 
-        if (mData == null) {
+        // check if chart is empty
+        if (isEmpty()) {
 
             boolean hasText = !TextUtils.isEmpty(mNoDataText);
 
