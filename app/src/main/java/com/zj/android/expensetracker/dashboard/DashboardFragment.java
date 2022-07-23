@@ -202,7 +202,7 @@ public class DashboardFragment extends Fragment {
 
     private PieData setupPieData() {
         List<PieEntry> pieEntries = DatabaseAccessor.getPieData(mSelectedYear);
-        PieDataSet pieDataSet = new PieDataSet(pieEntries, "hmm");
+        PieDataSet pieDataSet = new PieDataSet(pieEntries, "");
         pieDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
         pieDataSet.setValueTextSize(TEXT_SIZE);
         return new PieData(pieDataSet);

@@ -192,6 +192,8 @@ public class DatabaseAccessor {
     }
 
     /**
+     * Get only expenses for pie chart data. Amount * -1 to render correctly on pie chart.
+     * <p>
      * SELECT c.name, SUM(amount)
      * FROM expenses as e LEFT OUTER JOIN categories as c on e.category_uuid = c.uuid
      * WHERE strftime('%Y', date) = '2022'
@@ -202,17 +204,17 @@ public class DatabaseAccessor {
         String sql = String.format(
                 "SELECT c.%s AS Category, SUM(e.%s) AS Total " +
                         "FROM %s AS e LEFT OUTER JOIN %s AS c ON e.%s = c.%s " +
-                        "WHERE strftime('%%Y', %s) = '%s' " +
+                        "WHERE strftime('%%Y', %s) = '%s' and e.%s < 0 " +
                         "GROUP BY Category ",
                 CategoryTable.Cols.NAME, ExpenseTable.Cols.AMOUNT,
                 ExpenseTable.NAME, CategoryTable.NAME, ExpenseTable.Cols.CATEGORY_UUID, CategoryTable.Cols.UUID,
-                ExpenseTable.Cols.DATE, period
+                ExpenseTable.Cols.DATE, period, ExpenseTable.Cols.AMOUNT
         );
         DatabaseCursorWrapper cursor = query(sql, null);
         try {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
-                entries.add(new PieEntry((float) cursor.getDouble("Total"),
+                entries.add(new PieEntry((float) cursor.getDouble("Total") * -1,
                         cursor.getString("Category")));
                 cursor.moveToNext();
             }
