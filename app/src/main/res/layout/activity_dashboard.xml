@@ -18,13 +18,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
             android:text="@string/top_tabLayout_title"
             android:textStyle="bold" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/graph_tab_layout"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             app:tabMode="scrollable">
@@ -39,7 +39,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <com.zj.android.expensetracker.CustomLibrary.charting.charts.BarChart

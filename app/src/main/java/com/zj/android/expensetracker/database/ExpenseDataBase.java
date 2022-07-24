@@ -12,6 +12,8 @@ import com.zj.android.expensetracker.database.ExpenseDbSchema.ExpenseTable;
 import com.zj.android.expensetracker.models.Category;
 import com.zj.android.expensetracker.models.Expense;
 
+import java.util.Locale;
+
 public class ExpenseDataBase extends SQLiteOpenHelper {
     private static final int VERSION = 1;
     private static final String DATABASE_NAME = "expense.db";
@@ -81,15 +83,14 @@ public class ExpenseDataBase extends SQLiteOpenHelper {
         String[] category = new String[]{"Grocery", "Fuel", "Dining",
                 "Subscriptions", "Miscellaneous"};
         for (int year = 2022; year >= 2019; year--) {
-            if (year == 2018) break;
             for (int i = 1; i <= 12; i++) {
                 for (int j = 0; j < 5; j++) {
-                    String date = String.format("%d-%02d-%02d 12:00:00", year, i, j);
+                    String date = String.format(Locale.getDefault(), "%d-%02d-%02d 12:00:00", year, i, j);
                     double amt = -100.00 + Math.random() * -500.00;
                     Expense expense = new Expense(new CustomDate(date), category[(int) (Math.random() * 4)], "Some details here.", amt);
                     addExpense(expense);
                 }
-                String date = String.format("%d-%02d-01 12:00:00", year, i);
+                String date = String.format(Locale.getDefault(), "%d-%02d-01 12:00:00", year, i);
                 Expense expense = new Expense(new CustomDate(date), "Salary", "Some details here.", 2000.00);
                 addExpense(expense);
             }

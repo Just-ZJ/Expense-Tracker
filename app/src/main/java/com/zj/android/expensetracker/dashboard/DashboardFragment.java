@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.tabs.TabLayout;
 import com.zj.android.expensetracker.CustomLibrary.charting.charts.BarChart;
@@ -21,7 +20,6 @@ import com.zj.android.expensetracker.CustomLibrary.charting.data.PieData;
 import com.zj.android.expensetracker.CustomLibrary.charting.data.PieDataSet;
 import com.zj.android.expensetracker.CustomLibrary.charting.data.PieEntry;
 import com.zj.android.expensetracker.CustomLibrary.charting.utils.ColorTemplate;
-import com.zj.android.expensetracker.CustomViewModel;
 import com.zj.android.expensetracker.R;
 import com.zj.android.expensetracker.database.DatabaseAccessor;
 
@@ -34,7 +32,7 @@ public class DashboardFragment extends Fragment {
 
     private final float TEXT_SIZE = 14f;
     private View mView;
-    private CustomViewModel mViewModel;
+    //    private CustomViewModel mViewModel;
     private String mSelectedYear;
     private BarChart mBarChart;
     private PieChart mPieChart;
@@ -45,7 +43,7 @@ public class DashboardFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         mView = inflater.inflate(R.layout.activity_dashboard, container, false);
-        mViewModel = new ViewModelProvider(requireActivity()).get(CustomViewModel.class);
+//        mViewModel = new ViewModelProvider(requireActivity()).get(CustomViewModel.class);
         DatabaseAccessor databaseAccessor = new DatabaseAccessor(requireContext());
 
         // populate years in the tab layout at the top

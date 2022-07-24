@@ -129,7 +129,7 @@ public class TransactionFragment extends Fragment {
 
         @Override
         public View getGroupView(int i, boolean b, View view, ViewGroup viewGroup) {
-            String month = (String) getGroup(i);
+            String month = getGroup(i);
             if (month.equals("Empty Group")) {
                 LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 return inflater.inflate(R.layout.fragment_transaction_empty, null);

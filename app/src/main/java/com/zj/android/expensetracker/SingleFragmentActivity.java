@@ -53,9 +53,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
             bottomNavigationView.setSelectedItemId(R.id.bottom_appbar_dashboard);
         });
         FloatingActionButton menu_fab = findViewById(R.id.floating_action_button);
-        menu_fab.setOnClickListener(view -> {
-            mViewPager2.setCurrentItem(1, true);
-        });
+        menu_fab.setOnClickListener(view -> mViewPager2.setCurrentItem(1, true));
         BottomNavigationItemView menu_transaction = findViewById(R.id.bottom_appbar_transaction);
         menu_transaction.setOnClickListener(view -> {
             mViewPager2.setCurrentItem(2, true);
@@ -78,9 +76,8 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
                 case 1:
                     return new AddItemActivity().createFragment();
                 case 2:
-                    return new TransactionActivity().createFragment();
                 default:
-                    return null;
+                    return new TransactionActivity().createFragment();
             }
         }
 

@@ -48,13 +48,10 @@ public class DatabaseAccessor {
                 + " FROM " + ExpenseTable.NAME
                 + " WHERE strftime('%Y-%m', " + ExpenseTable.Cols.DATE + ") = ?";
         String[] whereArgs = new String[]{period};
-        DatabaseCursorWrapper cursor = query(sql, whereArgs);
 
-        try {
+        try (DatabaseCursorWrapper cursor = query(sql, whereArgs)) {
             cursor.moveToFirst();
             return (float) cursor.getDouble("TotalAmount");
-        } finally {
-            cursor.close();
         }
     }
 
@@ -68,15 +65,12 @@ public class DatabaseAccessor {
                 " WHERE strftime('%Y-%m', " + ExpenseTable.Cols.DATE + ") = ?" +
                 " ORDER BY " + ExpenseTable.Cols.DATE + " DESC";
         String[] whereArgs = new String[]{period};
-        DatabaseCursorWrapper cursor = query(sql, whereArgs);
-        try {
+        try (DatabaseCursorWrapper cursor = query(sql, whereArgs)) {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 expenses.add(cursor.getExpense());
                 cursor.moveToNext();
             }
-        } finally {
-            cursor.close();
         }
         return expenses;
     }
@@ -89,16 +83,13 @@ public class DatabaseAccessor {
         String sql = "SELECT DISTINCT strftime('%Y', " + ExpenseTable.Cols.DATE + ") as Year"
                 + " FROM " + ExpenseTable.NAME
                 + " ORDER BY Year ASC";
-        DatabaseCursorWrapper cursor = query(sql, null);
 
-        try {
+        try (DatabaseCursorWrapper cursor = query(sql, null)) {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 years.add(cursor.getString("Year"));
                 cursor.moveToNext();
             }
-        } finally {
-            cursor.close();
         }
         return years;
     }
@@ -113,15 +104,12 @@ public class DatabaseAccessor {
         String sql = "SELECT DISTINCT strftime('%Y-%m', " + ExpenseTable.Cols.DATE + ") as MonthYear" +
                 " FROM " + ExpenseTable.NAME +
                 " ORDER BY MonthYear DESC";
-        DatabaseCursorWrapper cursor = query(sql, null);
-        try {
+        try (DatabaseCursorWrapper cursor = query(sql, null)) {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 monthYear.add(cursor.getString("MonthYear"));
                 cursor.moveToNext();
             }
-        } finally {
-            cursor.close();
         }
         return monthYear;
     }
@@ -140,12 +128,9 @@ public class DatabaseAccessor {
                 " FROM " + ExpenseTable.NAME +
                 " WHERE strftime('%Y-%m', " + ExpenseTable.Cols.DATE + ") = ?";
         String[] whereArgs = new String[]{period};
-        DatabaseCursorWrapper cursor = query(sql, whereArgs);
-        try {
+        try (DatabaseCursorWrapper cursor = query(sql, whereArgs)) {
             cursor.moveToFirst();
             return cursor.getInt("MonthYearCount");
-        } finally {
-            cursor.close();
         }
     }
 
@@ -176,8 +161,7 @@ public class DatabaseAccessor {
     public static String[] getCategories() {
         String[] categories = new String[getCategoriesCount()];
         String sql = "SELECT * FROM " + CategoryTable.NAME;
-        DatabaseCursorWrapper cursor = query(sql, null);
-        try {
+        try (DatabaseCursorWrapper cursor = query(sql, null)) {
             cursor.moveToFirst();
             int i = 0;
             while (!cursor.isAfterLast()) {
@@ -185,8 +169,6 @@ public class DatabaseAccessor {
                 categories[i++] = tmp.getName();
                 cursor.moveToNext();
             }
-        } finally {
-            cursor.close();
         }
         return categories;
     }
@@ -210,16 +192,13 @@ public class DatabaseAccessor {
                 ExpenseTable.NAME, CategoryTable.NAME, ExpenseTable.Cols.CATEGORY_UUID, CategoryTable.Cols.UUID,
                 ExpenseTable.Cols.DATE, period, ExpenseTable.Cols.AMOUNT
         );
-        DatabaseCursorWrapper cursor = query(sql, null);
-        try {
+        try (DatabaseCursorWrapper cursor = query(sql, null)) {
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 entries.add(new PieEntry((float) cursor.getDouble("Total") * -1,
                         cursor.getString("Category")));
                 cursor.moveToNext();
             }
-        } finally {
-            cursor.close();
         }
         return entries;
     }
