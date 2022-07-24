@@ -74,10 +74,7 @@ public class DashboardFragment extends Fragment {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 mSelectedYear = tab.getText().toString(); // update year
-                mBarChart.setData(setupBarData());
-                mBarChart.invalidate(); // refresh chart
-                mPieChart.setData(setupPieData());
-                mPieChart.invalidate(); // refresh chart
+                refreshCharts();
             }
 
             @Override
@@ -105,10 +102,7 @@ public class DashboardFragment extends Fragment {
             }
             if (years.size() > 0) mSelectedYear = years.get(0);
         }
-        mBarChart.setData(setupBarData());
-        mBarChart.invalidate(); // refresh chart
-        mPieChart.setData(setupPieData());
-        mPieChart.invalidate(); // refresh chart
+        refreshCharts();
     }
 
     /*------------------------------ Helper Methods ------------------------------*/
@@ -116,6 +110,16 @@ public class DashboardFragment extends Fragment {
         TabLayout.Tab tab = tabLayout.newTab();
         tab.setText(year);
         tabLayout.addTab(tab);
+    }
+
+    /**
+     * Refreshes the data for bar chart & pie chart
+     */
+    private void refreshCharts() {
+        mBarChart.setData(setupBarData());
+        mBarChart.invalidate(); // refresh chart
+        mPieChart.setData(setupPieData());
+        mPieChart.invalidate(); // refresh chart
     }
 
     /*------------------------------ Bar Chart Helper Methods ------------------------------*/
